@@ -21,23 +21,39 @@ def compute_gradient_MSE(y, tx, w):
 
 
 def least_squares_GD(y, tx, initial_w, max_iters, gamma):
+    # define parameters to store w and loss
+    ws = [initial_w]
+    losses = []
     w = initial_w
     for n_iter in range(max_iters):
         w = w - gamma*compute_gradient_MSE(y,tx,w)
-    loss = compute_loss_MSE(y, tx, w)
-    return w,loss
+        loss = compute_loss_MSE(y, tx, w)
+        # store w and loss
+        ws.append(w)
+        losses.append(loss)
+        print("Gradient Descent({bi}/{ti}): loss={l}, w0={w0}, w1={w1}".format(
+              bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]))
+    return ws,losses
 
 
-def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
+def least_squares_SGD(y, tx, initial_w, batch_size = 1, max_iters, gamma):
+    # define parameters to store w and loss
+    losses = []
+    ws = [initial_w]
     w = initial_w
     g = 0
     for n_iter in range(max_iters):
-        #batch_size is chosen 1
-        for b_y, b_x in batch_iter(y, tx, 1):  # since n_batches is by default = 1, this loop is done only once
+        for b_y, b_x in batch_iter(y, tx, batch_size): #batch_size is chosen 1 if no parameter is passed
             g = gamma * compute_gradient_MSE(b_y, b_x, w)
-        w = w - g
-    loss = compute_loss_MSE(y, tx, w)
-    return w,loss
+            w = w - g
+            loss = compute_loss_MSE(y, tx, w)
+            # store w and loss
+        ws.append(w)
+        losses.append(loss/batch_size)
+        print("Gradient Descent({bi}/{ti}): loss={l}, w0={w0}, w1={w1}".format(
+              bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]))
+    
+    return losses, ws
 
 
 # Methods from LAB 3
