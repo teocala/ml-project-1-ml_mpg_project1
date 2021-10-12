@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 
 # PLEASE, CHECK ALL THE IMPLEMENTATIONS
 # Functions needed for the project (see "Step 2" in "project1_description.pdf")
@@ -14,7 +13,7 @@ def compute_loss_MSE(y, tx, w):
     INPUTS: y = target, tx = sample matrix, w = weights vector
     OUTPUT: evaluation of the MSE given the inputs
     """
-   
+    
     e = y - tx @ w
     N = len(y)
     return (e**2).sum()/(2*N)
@@ -45,7 +44,7 @@ def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     w = initial_w
     for n_iter in range(max_iters):
         w = w - gamma*compute_gradient_MSE(y,tx,w)
-        loss = compute_loss_MSE(y, tx, w)
+    loss = compute_loss_MSE(y, tx, w)
     return w,loss
 
 def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
@@ -78,7 +77,7 @@ def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
 
 
 
-def least_squares_SGD(y, tx, initial_w, batch_size = 1, max_iters, gamma):
+def least_squares_SGD(y, tx, initial_w, max_iters, gamma, batch_size = 1):
     
     """
     Stochastic Gradient Descent algorithm
@@ -89,7 +88,7 @@ def least_squares_SGD(y, tx, initial_w, batch_size = 1, max_iters, gamma):
     for n_iter in range(max_iters):
         for b_y, b_x in batch_iter(y, tx, batch_size): #batch_size is chosen 1 if no parameter is passed
             g = gamma * compute_gradient_MSE(b_y, b_x, w)
-         w = w - g
+        w = w - g
     loss = compute_loss_MSE(y, tx, w)
     return w,loss
 
