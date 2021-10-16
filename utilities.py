@@ -18,9 +18,9 @@ def missing_values(X):
             mean = np.mean(X_feature[X_feature != -999])
             X[:,i] = np.where(X[:,i]==-999, mean, X[:,i]) 
                     
-    X[:,cols_todelete]=0
-        
-    return X
+    X = np.delete(X, cols_todelete, axis = 1)
+    D = X.shape[1]    
+    return X,D
 
 def normalize(X):
     """
