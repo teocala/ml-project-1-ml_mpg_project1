@@ -1,125 +1,108 @@
 import numpy as np
+from implementations import *
 
-# PLEASE, CHECK ALL THE IMPLEMENTATIONS
-# Functions needed for the project (see "Step 2" in "project1_description.pdf")
+def missing_values(X):
+    """
+    Deletion of features with more than 70% missing values and imposition of the mean in the remaining features
+    """
+    N, D = X.shape
+    missing_data = np.zeros(D)
+    cols_todelete = [] 
+    for i in range(D):
+        missing_data[i] = np.count_nonzero(X[:,i]==-999)/N
+      
+        if missing_data[i]>0.7: 
+            cols_todelete.append(i)
+           
+        elif missing_data[i]>0:
+            X_feature = X[:,i]
+            mean = np.mean(X_feature[X_feature != -999])
+            X[:,i] = np.where(X[:,i]==-999, mean, X[:,i]) 
+                    
+    X = np.delete(X, cols_todelete, axis = 1)
+    D = X.shape[1]    
+    return X,D
 
+def normalize(X):
+    """
+    Normalization of the features values by division by the maximum value for each feature
+    """
+    D = X.shape[1]
+    for i in range(D):
+        maximum = np.max(abs(X[:,i]))
+        if (maximum != 0.0) : X[:,i] = X[:,i]/maximum
+    return X
 
-# Methods from LAB 2
+def standardize(x, mean=None, std=None):
+    """ 
+    Standardization of a vector: mean is subtracted, then division by the standard deviation 
+    """
+    if mean is None:
+        mean = np.mean(x, axis=0)
+    x = x - mean
+    if std is None:
+        std = np.std(x, axis=0)
+    x = x[:, std > 0] / std[std > 0]
 
-def compute_loss_MSE(y, tx, w):
+    return x
+
+def standardize_tX(X):
+    """
+    Standardization of the whole training dataset
+    """
+    N = X.shape[0]
+    D = X.shape[1]
+    for i in range(D):
+        X[:,i] = np.reshape(standardize(X[:,i]),(N,))
     
+    return X
+
+def eliminate_outliers(X, a):
     """
-    Computes the loss function using the Mean Squared Error as Cost
-    INPUTS: y = target, tx = sample matrix, w = weights vector
-    OUTPUT: evaluation of the MSE given the inputs
+    Given the quantile of order a, the upper and lower tail of the data are cut, by imposing the value of the 1-a and a quantile,   respcetively
     """
-    
-    e = y - tx @ w
-    N = len(y)
-    return (e**2).sum()/(2*N)
+    D = X.shape[1]
+    for i in range(D):
+        X[:,i][ X[:,i]<np.quantile(X[:,i],a) ] = np.quantile(X[:,i],a)
+        X[:,i][ X[:,i]>np.quantile(X[:,i],1-a) ] = np.quantile(X[:,i],1-a)
+        
+    return X
 
 
-def compute_gradient_MSE(y, tx, w):
-    
-    """
-    Computes the gradient of the Loss function with MSE
-    INPUTS: y = target, tx = sample matrix, w = weights vector
-    OUTPUT: g = gradient of the MSE with respect to w
-    """
-    
-    e = y - tx @ w
-    N = len(y)
-    g = -(1/N)*(tx.T @ e)
-    return g
+def build_k_indices(y, k_fold, seed):
+    """build k indices for k-fold."""
+    num_row = y.shape[0]
+    interval = int(num_row / k_fold)
+    np.random.seed(seed)
+    indices = np.random.permutation(num_row)
+    k_indices = [indices[k * interval: (k + 1) * interval]
+                 for k in range(k_fold)]
+    return np.array(k_indices)
 
+def cross_validation(y, x, k_indices, k, lambda_):
+    """return the loss of ridge regression."""
+    # get k'th subgroup in test, others in train:
+    ind = k_indices[k,:]
+    x_te = x[ind]
+    y_te = y[ind]
+    ind_tr = np.delete(k_indices, (k), axis = 0)
+    #print(ind_tr.shape)
+    x_tr = np.vstack(x[ind_tr])
+    y_tr = np.hstack(y[ind_tr])
+    # ridge regression:
+    #print(y_tr.shape)
+    #print(x_tr.shape)
+    w, loss_tr = ridge_regression(y_tr, x_tr, lambda_)
+    # calculate the loss for test data:
+    e_te = y_te - x_te.dot(w)
+    loss_te = 1/(2*len(y_te)) * np.transpose(e_te).dot(e_te)
+    return w, loss_tr, loss_te
 
-def least_squares_GD(y, tx, initial_w, max_iters, gamma):
-    
-    """
-    Gradient Descent algorithm  using MSE as Cost 
-    INPUTS: y = target, tx = sample matrix, w = intial guess for the weights vector, max_iters = maximum number of iterations, gamma = learning rate
-    OUTPUT: w = weight vector computed with GD after max_iters iterations, loss = loss evaluation at w
-    """
-    
-    w = initial_w
-    for n_iter in range(max_iters):
-        w = w - gamma*compute_gradient_MSE(y,tx,w)
-    loss = compute_loss_MSE(y, tx, w)
-    return w,loss
-
-def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
-    
-    # Auxiliary function for least_squares_SGD
-    
-    """
-    Generate a minibatch iterator for a dataset.
-    Takes as input two iterables (here the output desired values 'y' and the input data 'tx')
-    Outputs an iterator which gives mini-batches of `batch_size` matching elements from `y` and `tx`.
-    Data can be randomly shuffled to avoid ordering in the original data messing with the randomness of the minibatches.
-    Example of use :
-    for minibatch_y, minibatch_tx in batch_iter(y, tx, 32):
-        <DO-SOMETHING>
-    """
-    data_size = len(y)
-
-    if shuffle:
-        shuffle_indices = np.random.permutation(np.arange(data_size))
-        shuffled_y = y[shuffle_indices]
-        shuffled_tx = tx[shuffle_indices]
-    else:
-        shuffled_y = y
-        shuffled_tx = tx
-    for batch_num in range(num_batches):
-        start_index = batch_num * batch_size
-        end_index = min((batch_num + 1) * batch_size, data_size)
-        if start_index != end_index:
-            yield shuffled_y[start_index:end_index], shuffled_tx[start_index:end_index]
-
-
-
-def least_squares_SGD(y, tx, initial_w, max_iters, gamma, batch_size = 1):
-    
-    """
-    Stochastic Gradient Descent algorithm
-    INPUTS: y = target, tx = sample matrix, initial_w = intial guess for the weights vector, batch_size = number of samples on which the new gradient is computed (by default = 1), max_iters = maximum number of iterations, gamma = learning rate
-    """
-    w = initial_w
-    g = 0
-    for n_iter in range(max_iters):
-        for b_y, b_x in batch_iter(y, tx, batch_size): #batch_size is chosen 1 if no parameter is passed
-            g = gamma * compute_gradient_MSE(b_y, b_x, w)
-        w = w - g
-    loss = compute_loss_MSE(y, tx, w)
-    return w,loss
-
-
-# Methods from LAB 3
-
-def least_squares(y, tx):
-    
-    """
-    Computation of the weights vector by solving the normal equations for linear regression
-    INPUTS: y = target, tx = sample matrix
-    OUTPUTS: w = weights vector, loss = corresponding MSE evaluation
-    """
-    
-    w = np.linalg.solve(tx.T @ tx, tx.T @ y)
-    loss = compute_loss_MSE(y,tx,w)
-    return w,loss
-
-
-def ridge_regression(y, tx, lambda_):
-    
-    """
-    Computation of the weights vector by solving the L2-regularized normal equations for linear regression
-    INPUTS: y = target, tx = sample matrix, lambda_ = regularization parameter
-    OUTPUTS: w = weights vector, loss = corresponding MSE evaluation
-    """
-    
-    N = len(y)
-    D = tx.shape[1]
-    I = np.eye(D)
-    w = np.linalg.solve(tx.T @ tx + 2*N*lambda_*I, tx.T @ y)
-    loss = compute_loss_MSE(y, tx, w)
-    return w,loss
-
+def build_poly(x, degree):
+    """polynomial basis functions for input data x, for j=0 up to j=degree."""
+    N = x.shape[0]
+    basis = np.zeros([N,degree+1])
+    for n in range(N):
+        for i in range(degree+1):
+            basis[n,i] = x[n]**i
+    return basis
