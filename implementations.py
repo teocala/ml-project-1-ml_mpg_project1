@@ -81,6 +81,7 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma, batch_size = 1):
     """
     Stochastic Gradient Descent algorithm
     INPUTS: y = target, tx = sample matrix, initial_w = intial guess for the weights vector, batch_size = number of samples on which the new gradient is computed (by default = 1), max_iters = maximum number of iterations, gamma = learning rate
+    OUTPUT: w = weights vector at last iteration, loss = MSE evaluation at last iteration
     """
     w = initial_w
     g = 0
@@ -90,6 +91,8 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma, batch_size = 1):
         w = w - g
     loss = compute_loss_MSE(y, tx, w)
     return w,loss
+
+
 
 
 # Methods from LAB 3
@@ -121,3 +124,78 @@ def ridge_regression(y, tx, lambda_):
     w = np.linalg.solve(tx.T @ tx + 2*N*lambda_*I, tx.T @ y)
     loss = compute_loss_MSE(y, tx, w)
     return w,loss
+
+
+
+
+
+# Methods from LAB 5
+
+sigmoid = lambda x : 1./(1.+np.exp(-x))
+"""Sigmoid function for logistic regression"""
+
+
+def compute_loss_logistic(y, tx, w):
+    """
+    Computation of the logistic loss (negative log likelihood)
+    INPUTS: y = target, tx = sample matrix, w = weights vector
+    OUTPUTS: evaluation of the loss
+    """
+    return -y.T.dot(np.log(sigmoid(tx.dot(w)))) - (1.-y).T.dot(np.log(1. - sigmoid(tx.dot(w))))
+
+
+def compute_gradient_logistic(y, tx, w):
+    """
+    Computation of the gradient of the logistic loss (negative log likelihood)
+    INPUTS: y = target, tx = sample matrix, w = weights vector
+    OUTPUTS: evaluation of the gradient of the loss
+    """
+    return -tx.T.dot(y-sigmoid(tx.dot(w)))
+
+
+def logistic_regression(y, tx, initial_w, max_iters, gamma):
+    """
+    Logistic Gradient Descent algorithm
+    INPUTS: y = target, tx = sample matrix, initial_w = intial guess for the weights vector, max_iters = maximum number of iterations, gamma = learning rate
+    OUTPUT: w = weights vector at last iteration, loss = logistic loss evaluation at last iteration
+    """
+    w = initial_w
+    for iter in range(max_iters):
+        loss = compute_loss_logistic(y,tx,w)
+        g = compute_gradient_logistic(y,tx,w)
+        w = w - gamma*g
+    return loss, w
+
+
+def compute_loss_reg_logistic(y, tx, w, lambda_):
+    """
+    Computation of the regularized logistic loss (negative log likelihood)
+    INPUTS: y = target, tx = sample matrix, w = weights vector
+    OUTPUTS: evaluation of the loss
+    """
+    return compute_loss_logistic(y,tx,w) + lambda_*np.linalg.norm(w,2)**2
+
+
+def compute_gradient_reg_logistic(y, tx, w, lambda_):
+    """
+    Computation of the gradient of the regularized logistic loss (negative log likelihood)
+    INPUTS: y = target, tx = sample matrix, w = weights vector
+    OUTPUTS: evaluation of the gradient of the loss
+    """
+    return compute_gradient_logistic(y,tx,w) + 2*lambda_*w
+
+
+def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
+    """
+    Regularized Logistic Gradient Descent algorithm
+    INPUTS: y = target, tx = sample matrix, lambda_ = regularization parameter, initial_w = intial guess for the weights vector, max_iters = maximum number of iterations, gamma = learning rate
+    OUTPUT: w = weights vector at last iteration, loss = logistic loss evaluation at last iteration
+    """
+    w = initial_w
+    for iter in range(max_iters):
+        loss = compute_loss_reg_logistic(y,tx,w)
+        g = compute_gradient_reg_logistic(y,tx,w)
+        w = w - gamma*g
+    return loss, w
+
+
