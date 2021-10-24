@@ -22,31 +22,46 @@ if __name__ == '__main__':
     #  or
     #  2) https://www.aicrowd.com/challenges/epfl-machine-learning-higgs
 
+    """ Acquisition of train and test data """
     DATA_TRAIN_PATH = '../data/train.csv'
     y, tX, ids = load_csv_data(DATA_TRAIN_PATH)
-    N = len(y) # training set cardinality
-    D = tX.shape[1] # number of parameters ("dimensionality")
-    y [y < 0] = 0
-
-
     DATA_TEST_PATH = '../data/test.csv'
     _, tX_test, ids_test = load_csv_data(DATA_TEST_PATH)
+    N = len(y) # training set cardinality
+    D = tX.shape[1] # number of parameters ("dimensionality")
 
 
-    weights = np.zeros(D)
-    tX, D_del, cols_deleted, cols_kept = missing_values(tX)
-    tX = standardize_tX(tX)
+
+    """ Parameters assignment """
     alpha = 0.1
-    tX = eliminate_outliers(tX, alpha)
-    initial_w = np.zeros(D_del)
     maxiter = 5000
     gamma = 0.00001
+
+
+
+    """ Correction of the training data """
+    y [y < 0] = 0
+    tX, D_del, cols_deleted, cols_kept = missing_values_elimination(tX)
+    tX = standardize_tX(tX)
+    tX = eliminate_outliers(tX, alpha)
+
+
+
+    """ Logistic regression on the training set """
+    weights = np.zeros(D)
+    initial_w = np.zeros(D_del)
     loss, weights_hat = logistic_regression(y, tX, initial_w, maxiter, gamma)
     weights[cols_kept] = weights_hat
 
     
-    # Creation of the submission file
-    OUTPUT_PATH = '../data/submission.csv'
+
+    """ Correction of the test data """
+    tX_test = missing_values_correction(tX_test)
     tX_test = standardize_tX(tX_test)
+
+
+
+    """ Creation of the submission file """
+    OUTPUT_PATH = '../data/submission.csv'
     y_pred = predict_labels(weights, tX_test)
     create_csv_submission(ids_test, y_pred, OUTPUT_PATH)

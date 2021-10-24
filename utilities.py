@@ -1,7 +1,7 @@
 import numpy as np
 from implementations import *
 
-def missing_values(X):
+def missing_values_elimination(X):
     """
     Deletion of features with more than 70% missing values and imposition of the mean in the remaining features
     """
@@ -23,6 +23,21 @@ def missing_values(X):
     X = np.delete(X, cols_to_delete, axis = 1)
     D_del = X.shape[1]
     return X,D_del,cols_to_delete,cols_to_keep
+
+def missing_values_correction(X):
+    """
+    Correction of the missing terms (=-999) with the imposition of the mean value
+    """
+    N, D = X.shape
+    missing_data = np.zeros(D)
+    for i in range(D):
+        missing_data[i] = np.count_nonzero(X[:,i]==-999)
+        if missing_data[i]>0:
+            X_feature = X[:,i]
+            mean = np.mean(X_feature[X_feature != -999])
+            X[:,i] = np.where(X[:,i]==-999, mean, X[:,i])
+    return X
+
 
 def normalize(X):
     """
