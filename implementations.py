@@ -131,7 +131,7 @@ def ridge_regression(y, tx, lambda_):
 
 # Methods from LAB 5
 
-sigmoid = lambda x : 1./(1.+np.exp(-x))
+sigmoid = lambda x : 1/(1+np.exp(-x))
 """Sigmoid function for logistic regression"""
 
 
@@ -141,7 +141,7 @@ def compute_loss_logistic(y, tx, w):
     INPUTS: y = target, tx = sample matrix, w = weights vector
     OUTPUTS: evaluation of the loss
     """
-    return -y.T.dot(np.log(sigmoid(tx.dot(w)))) - (1.-y).T.dot(np.log(1. - sigmoid(tx.dot(w))))
+    return -y.T.dot(np.log(sigmoid(tx.dot(w)))) - (1-y).T.dot(np.log(1 - sigmoid(tx.dot(w))))
 
 
 def compute_gradient_logistic(y, tx, w):
@@ -164,6 +164,7 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
         loss = compute_loss_logistic(y,tx,w)
         g = compute_gradient_logistic(y,tx,w)
         w = w - gamma*g
+    print(loss)
     return loss, w
 
 
@@ -193,8 +194,8 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     """
     w = initial_w
     for iter in range(max_iters):
-        loss = compute_loss_reg_logistic(y,tx,w)
-        g = compute_gradient_reg_logistic(y,tx,w)
+        loss = compute_loss_reg_logistic(y,tx,w, lambda_)
+        g = compute_gradient_reg_logistic(y,tx,w, lambda_)
         w = w - gamma*g
     return loss, w
 

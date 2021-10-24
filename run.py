@@ -26,6 +26,7 @@ if __name__ == '__main__':
     y, tX, ids = load_csv_data(DATA_TRAIN_PATH)
     N = len(y) # training set cardinality
     D = tX.shape[1] # number of parameters ("dimensionality")
+    y [y < 0] = 0
 
 
     DATA_TEST_PATH = '../data/test.csv'
@@ -33,21 +34,19 @@ if __name__ == '__main__':
 
 
     weights = np.zeros(D)
-    tX, D, cols_deleted = missing_values(tX)
-    cols_kept = list(set(range(D)).difference(set(cols_deleted)))
+    tX, D_del, cols_deleted, cols_kept = missing_values(tX)
     tX = standardize_tX(tX)
     alpha = 0.1
     tX = eliminate_outliers(tX, alpha)
-    initial_w = np.zeros(D)
-    maxiter = 1000
-    gamma = 0.1
-    print(tX.shape)
-    print(y.shape)
-    loss, w_hat = logistic_regression(y, tX, initial_w, maxiter, gamma)
-    weights[cols_kept] = w_hat
+    initial_w = np.zeros(D_del)
+    maxiter = 5000
+    gamma = 0.00001
+    loss, weights_hat = logistic_regression(y, tX, initial_w, maxiter, gamma)
+    weights[cols_kept] = weights_hat
 
     
     # Creation of the submission file
     OUTPUT_PATH = '../data/submission.csv'
+    tX_test = standardize_tX(tX_test)
     y_pred = predict_labels(weights, tX_test)
     create_csv_submission(ids_test, y_pred, OUTPUT_PATH)
