@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from proj1_helpers import *
 from implementations import *
+from utilities import *
 
 
 """ MAIN """
@@ -37,10 +38,12 @@ if __name__ == '__main__':
     tX = standardize_tX(tX)
     alpha = 0.1
     tX = eliminate_outliers(tX, alpha)
-    initial_w = np.zeros(w.shape)
+    initial_w = np.zeros(D)
     maxiter = 1000
     gamma = 0.1
-    loss, w_hat = logistic_regression(y, tx, initial_w, max_iters, gamma)
+    print(tX.shape)
+    print(y.shape)
+    loss, w_hat = logistic_regression(y, tX, initial_w, maxiter, gamma)
     weights[cols_kept] = w_hat
 
     
