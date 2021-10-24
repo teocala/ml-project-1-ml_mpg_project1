@@ -26,11 +26,25 @@ if __name__ == '__main__':
     N = len(y) # training set cardinality
     D = tX.shape[1] # number of parameters ("dimensionality")
 
-    
-    DATA_TEST_PATH = '../data/test.csv' 
+
+    DATA_TEST_PATH = '../data/test.csv'
     _, tX_test, ids_test = load_csv_data(DATA_TEST_PATH)
+
+
+    weights = np.zeros(D)
+    tX, D, cols_deleted = missing_values(tX)
+    cols_kept = list(set(range(D)).difference(set(cols_deleted)))
+    tX = standardize_tX(tX)
+    alpha = 0.1
+    tX = eliminate_outliers(tX, alpha)
+    initial_w = np.zeros(w.shape)
+    maxiter = 1000
+    gamma = 0.1
+    loss, w_hat = logistic_regression(y, tx, initial_w, max_iters, gamma)
+    weights[cols_kept] = w_hat
+
     
     # Creation of the submission file
-    OUTPUT_PATH = '../data/submission.csv' 
+    OUTPUT_PATH = '../data/submission.csv'
     y_pred = predict_labels(weights, tX_test)
     create_csv_submission(ids_test, y_pred, OUTPUT_PATH)

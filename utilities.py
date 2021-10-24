@@ -7,21 +7,21 @@ def missing_values(X):
     """
     N, D = X.shape
     missing_data = np.zeros(D)
-    cols_todelete = [] 
+    cols_todelete = []
     for i in range(D):
         missing_data[i] = np.count_nonzero(X[:,i]==-999)/N
-      
-        if missing_data[i]>0.7: 
+
+        if missing_data[i]>0.7:
             cols_todelete.append(i)
-           
+
         elif missing_data[i]>0:
             X_feature = X[:,i]
             mean = np.mean(X_feature[X_feature != -999])
             X[:,i] = np.where(X[:,i]==-999, mean, X[:,i]) 
-                    
+
     X = np.delete(X, cols_todelete, axis = 1)
-    D = X.shape[1]    
-    return X,D
+    D = X.shape[1]
+    return X,D,cols_todelete
 
 def normalize(X):
     """
@@ -34,8 +34,8 @@ def normalize(X):
     return X
 
 def standardize(x, mean=None, std=None):
-    """ 
-    Standardization of a vector: mean is subtracted, then division by the standard deviation 
+    """
+    Standardization of a vector: mean is subtracted, then division by the standard deviation
     """
     if mean is None:
         mean = np.mean(x, axis=0)
@@ -54,7 +54,7 @@ def standardize_tX(X):
     D = X.shape[1]
     for i in range(D):
         X[:,i] = np.reshape(standardize(X[:,i]),(N,))
-    
+
     return X
 
 def eliminate_outliers(X, a):
@@ -65,7 +65,7 @@ def eliminate_outliers(X, a):
     for i in range(D):
         X[:,i][ X[:,i]<np.quantile(X[:,i],a) ] = np.quantile(X[:,i],a)
         X[:,i][ X[:,i]>np.quantile(X[:,i],1-a) ] = np.quantile(X[:,i],1-a)
-        
+
     return X
 
 
