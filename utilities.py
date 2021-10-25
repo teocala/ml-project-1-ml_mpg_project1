@@ -133,7 +133,7 @@ def cross_validation_logistic(y, x, k_indices, k, lambda_, initial_w, max_iters,
     # ridge regression:
     loss_tr, w = reg_logistic_regression(y_tr, x_tr, lambda_,initial_w, max_iters, gamma)
     # calculate the loss for test data:
-    loss_te = compute_loss_reg_logistic(y_te, x_te, w, lambda_)
+    loss_te = compute_loss_logistic(y_te, x_te, w, lambda_)
     return w, loss_tr, loss_te
 
 def plot_train_test(train_errors, test_errors, lambdas):
