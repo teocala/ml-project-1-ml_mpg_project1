@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 from implementations import *
 
 def missing_values_elimination(X):
@@ -16,8 +17,8 @@ def missing_values_elimination(X):
 
         elif missing_data[i]>0:
             X_feature = X[:,i]
-            mean = np.mean(X_feature[X_feature != -999])
-            X[:,i] = np.where(X[:,i]==-999, mean, X[:,i])
+            median = np.median(X_feature[X_feature != -999])
+            X[:,i] = np.where(X[:,i]==-999, median, X[:,i])
 
     cols_to_keep = list(set(range(D)).difference(set(cols_to_delete)))
     X = np.delete(X, cols_to_delete, axis = 1)
@@ -34,8 +35,8 @@ def missing_values_correction(X):
         missing_data[i] = np.count_nonzero(X[:,i]==-999)
         if missing_data[i]>0:
             X_feature = X[:,i]
-            mean = np.mean(X_feature[X_feature != -999])
-            X[:,i] = np.where(X[:,i]==-999, mean, X[:,i])
+            median = np.median(X_feature[X_feature != -999])
+            X[:,i] = np.where(X[:,i]==-999, median, X[:,i])
     return X
 
 
@@ -102,12 +103,9 @@ def cross_validation(y, x, k_indices, k, lambda_):
     x_te = x[ind]
     y_te = y[ind]
     ind_tr = np.delete(k_indices, (k), axis = 0)
-    #print(ind_tr.shape)
     x_tr = np.vstack(x[ind_tr])
     y_tr = np.hstack(y[ind_tr])
     # ridge regression:
-    #print(y_tr.shape)
-    #print(x_tr.shape)
     w, loss_tr = ridge_regression(y_tr, x_tr, lambda_)
     # calculate the loss for test data:
     e_te = y_te - x_te.dot(w)
@@ -122,3 +120,62 @@ def build_poly(x, degree):
         for i in range(degree+1):
             basis[n,i] = x[n]**i
     return basis
+
+def cross_validation_logistic(y, x, k_indices, k, lambda_, initial_w, max_iters, gamma):
+    """return the loss of ridge regression."""
+    # get k'th subgroup in test, others in train:
+    ind = k_indices[k,:]
+    x_te = x[ind]
+    y_te = y[ind]
+    ind_tr = np.delete(k_indices, (k), axis = 0)
+    x_tr = np.vstack(x[ind_tr])
+    y_tr = np.hstack(y[ind_tr])
+    # ridge regression:
+    loss_tr, w = reg_logistic_regression(y_tr, x_tr, lambda_,initial_w, max_iters, gamma)
+    # calculate the loss for test data:
+    loss_te = compute_loss_reg_logistic(y_te, x_te, w, lambda_)
+    return w, loss_tr, loss_te
+
+def plot_train_test(train_errors, test_errors, lambdas):
+    """
+    train_errors, test_errors and lambas should be list (of the same size) the respective train error and test error for a given lambda,
+    * lambda[0] = 1
+    * train_errors[0] = RMSE of a logistic regression on the train set
+    * test_errors[0] = RMSE of the parameter found by logistic regression applied on the test set
+    
+    degree is just used for the title of the plot.
+    """
+    plt.semilogx(lambdas, train_errors, color='b', marker='*', label="Train error")
+    plt.semilogx(lambdas, test_errors, color='r', marker='*', label="Test error")
+    plt.xlabel("lambda")
+    plt.ylabel("RMSE")
+    plt.title("Regularized Logistic Regression")
+    leg = plt.legend(loc=1, shadow=True)
+    leg.draw_frame(False)
+    plt.savefig("reg_logistic_regression")
+
+def choose_lambda_logistic(y,tX, initial_w, maxiter, gamma):
+    seed = 1
+    k_fold = 3
+    lambdas = np.logspace(-4, 0, 30)
+
+    # splitting data in k fold
+    k_indices = build_k_indices(y, k_fold, seed)
+
+    rmse_tr = []
+    rmse_te = []
+
+    for i in range(len(lambdas)):
+        lambda_ = lambdas[i]
+        tr_loss = 0
+        te_loss = 0
+        for k in range(k_fold): 
+            loss_tr, loss_te = cross_validation_logistic(y, tX, k_indices, k, lambda_, initial_w, maxiter, gamma)[1:]
+            tr_loss = tr_loss + loss_tr
+            te_loss = te_loss + loss_te
+        rmse_tr.append(np.sqrt(2 * tr_loss/k_fold))
+        rmse_te.append(np.sqrt(2 * te_loss/k_fold))
+    print(rmse_te)
+    print(rmse_tr)
+    plot_train_test(rmse_tr, rmse_te, lambdas) 
+    return lambdas[np.argmin(rmse_te)]

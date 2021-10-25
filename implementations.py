@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 # PLEASE, CHECK ALL THE IMPLEMENTATIONS
 # Functions needed for the project (see "Step 2" in "project1_description.pdf")

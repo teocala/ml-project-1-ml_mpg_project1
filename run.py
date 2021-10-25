@@ -34,7 +34,7 @@ if __name__ == '__main__':
 
     """ Parameters assignment """
     alpha = 0.1
-    maxiter = 5000
+    maxiter = 50
     gamma = 0.00001
 
 
@@ -47,13 +47,20 @@ if __name__ == '__main__':
 
 
 
-    """ Logistic regression on the training set """
-    weights = np.zeros(D)
-    initial_w = np.zeros(D_del)
-    loss, weights_hat = logistic_regression(y, tX, initial_w, maxiter, gamma)
-    weights[cols_kept] = weights_hat
+    # """ Logistic regression on the training set """
+    # weights = np.zeros(D)
+    # initial_w = least_squares(y,tX)[0]
+    # loss, weights_hat = logistic_regression(y, tX, initial_w, maxiter, gamma)
+    # weights[cols_kept] = weights_hat
 
-    
+    """ Regularized logistic regression """
+    initial_w = least_squares(y,tX)[0]
+    lambda_ = choose_lambda_logistic(y, tX, initial_w, maxiter, gamma)
+    maxiter = 5000
+    weights = np.zeros(D)
+    initial_w = least_squares(y,tX)[0]
+    loss, weights_hat = reg_logistic_regression(y, tX, lambda_, initial_w, maxiter, gamma)
+    weights[cols_kept] = weights_hat
 
     """ Correction of the test data """
     tX_test = missing_values_correction(tX_test)
