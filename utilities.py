@@ -112,14 +112,6 @@ def cross_validation(y, x, k_indices, k, lambda_):
     loss_te = 1/(2*len(y_te)) * np.transpose(e_te).dot(e_te)
     return w, loss_tr, loss_te
 
-def build_poly(x, degree):
-    """polynomial basis functions for input data x, for j=0 up to j=degree."""
-    N = x.shape[0]
-    basis = np.zeros([N,degree+1])
-    for n in range(N):
-        for i in range(degree+1):
-            basis[n,i] = x[n]**i
-    return basis
 
 def cross_validation_logistic(y, x, k_indices, k, lambda_, initial_w, max_iters, gamma):
     """return the loss of ridge regression."""
@@ -158,8 +150,8 @@ def plot_train_test(train_errors, test_errors, lambdas):
 
 def choose_lambda_logistic(y,tX, initial_w, maxiter, gamma):
     seed = 1
-    k_fold = 3
-    lambdas = np.logspace(-4, 0, 10)
+    k_fold = 4
+    lambdas = np.logspace(-6, 0, 20)
 
     # splitting data in k fold
     k_indices = build_k_indices(y, k_fold, seed)
@@ -181,3 +173,24 @@ def choose_lambda_logistic(y,tX, initial_w, maxiter, gamma):
     print(rmse_tr)
     plot_train_test(rmse_tr, rmse_te, lambdas) 
     return lambdas[np.argmin(rmse_te)]
+
+def build_poly(x, degree):
+    """polynomial basis functions for input data x, for j=0 up to j=degree."""
+    N, D = x.shape    
+    poly_basis = np.zeros(shape = (N, 1+D*(degree)))
+
+    poly_basis[:,0] = np.ones(N)
+
+    for deg in range(1,degree+1):
+        for i in range(D):
+            poly_basis[:, 1+D*(deg-1)+i ] = np.power(x[:,i],deg)      
+    
+    return poly_basis
+
+def phi(x, degree):
+    """
+    Transformation of X matrix with polynomial expansion of given degree
+    """
+    x_poly = build_poly(x, degree)
+    
+    return x_poly
