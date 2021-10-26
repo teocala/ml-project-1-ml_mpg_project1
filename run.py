@@ -50,10 +50,16 @@ if __name__ == '__main__':
 
 
     """ Logistic regression on the training set """
-    weights = np.zeros(D)
+    weights = np.zeros(D * degree + 1)
     initial_w = least_squares(y,tX)[0]
     loss, weights_hat = logistic_regression(y, tX, initial_w, maxiter, gamma)
-    weights[cols_kept] = weights_hat
+    new_cols_kept = []
+    ### where to put the intercept???
+    for i in range(0,degree):
+        cols_new = np.array(cols_kept) + (i * D + 1)
+        cols_new = cols_new.tolist()
+        new_cols_kept = new_cols_kept + cols_new
+    weights[new_cols_kept] = weights_hat
     
     # """ Logistic regression with SGD on the training set """
     # weights = np.zeros(D)
