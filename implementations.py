@@ -203,3 +203,17 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     return loss, w
 
 
+def logistic_regression_SGD(y, tx, initial_w, max_iters, gamma, batch_size = 1):
+    """
+    Logistic Stochastic Gradient Descent algorithm
+    INPUTS: y = target, tx = sample matrix, initial_w = intial guess for the weights vector, max_iters = maximum number of iterations, gamma = learning rate, batch_size = number of samples on which the new gradient is computed (by default = 1)
+    OUTPUT: w = weights vector at last iteration, loss = logistic loss evaluation at last iteration
+    """
+    w = initial_w
+
+    for i in range(max_iters):
+        for y_batch, tx_batch in batch_iter(y, tx, batch_size = batch_size, num_batches = 1):
+            loss = compute_loss_logistic(y_batch,tx_batch,w)
+            g = compute_gradient_logistic(y_batch,tx_batch,w)
+            w = w - gamma*g
+    return loss,w
