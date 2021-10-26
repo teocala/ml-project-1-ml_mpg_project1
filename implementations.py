@@ -142,7 +142,8 @@ def compute_loss_logistic(y, tx, w):
     INPUTS: y = target, tx = sample matrix, w = weights vector
     OUTPUTS: evaluation of the loss
     """
-    return -y.T.dot(np.log(sigmoid(tx.dot(w)))) - (1-y).T.dot(np.log(1 - sigmoid(tx.dot(w))))
+    n = len(y)
+    return (-y.T.dot(np.log(sigmoid(tx.dot(w)))) - (1-y).T.dot(np.log(1 - sigmoid(tx.dot(w)))))/n
 
 
 def compute_gradient_logistic(y, tx, w):
@@ -151,7 +152,8 @@ def compute_gradient_logistic(y, tx, w):
     INPUTS: y = target, tx = sample matrix, w = weights vector
     OUTPUTS: evaluation of the gradient of the loss
     """
-    return -tx.T.dot(y-sigmoid(tx.dot(w)))
+    n = len(y)
+    return -tx.T.dot(y-sigmoid(tx.dot(w)))/n
 
 
 def logistic_regression(y, tx, initial_w, max_iters, gamma):

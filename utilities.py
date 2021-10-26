@@ -128,12 +128,14 @@ def cross_validation_logistic(y, x, k_indices, k, lambda_, initial_w, max_iters,
     x_te = x[ind]
     y_te = y[ind]
     ind_tr = np.delete(k_indices, (k), axis = 0)
-    x_tr = np.vstack(x[ind_tr])
-    y_tr = np.hstack(y[ind_tr])
+    ind_tr = np.hstack(ind_tr)
+    x_tr = x[ind_tr]
+    y_tr = y[ind_tr]
     # ridge regression:
-    loss_tr, w = reg_logistic_regression(y_tr, x_tr, lambda_,initial_w, max_iters, gamma)
+    loss_tr, w = reg_logistic_regression(y_tr, x_tr, lambda_, initial_w, max_iters, gamma)
     # calculate the loss for test data:
-    loss_te = compute_loss_logistic(y_te, x_te, w, lambda_)
+    loss_tr = compute_loss_logistic(y_tr, x_tr, w)
+    loss_te = compute_loss_logistic(y_te, x_te, w)
     return w, loss_tr, loss_te
 
 def plot_train_test(train_errors, test_errors, lambdas):
@@ -157,7 +159,7 @@ def plot_train_test(train_errors, test_errors, lambdas):
 def choose_lambda_logistic(y,tX, initial_w, maxiter, gamma):
     seed = 1
     k_fold = 3
-    lambdas = np.logspace(-4, 0, 30)
+    lambdas = np.logspace(-4, 0, 10)
 
     # splitting data in k fold
     k_indices = build_k_indices(y, k_fold, seed)
