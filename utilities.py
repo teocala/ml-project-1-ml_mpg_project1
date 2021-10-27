@@ -240,26 +240,4 @@ def k_nearest(x, y, x_test, k):
 
     return y_test
 
-def plot_labels_in_training(y,tX):
-    msk_jets_train = {
-        0: tX[:, 22] == 0,
-        1: tX[:, 22] == 1,
-        2: tX[:, 22] == 2, 
-        3: tX[:, 22] == 3
-        }
 
-    ax = plt.subplot(111)
-    colors = ['b','g','r','y']
-    legend = ['class: 0','class: 1','class: 2','class: 3']
-    ind = np.array([-1,  1])
-    w = 0.25
-    for idx in range(len(msk_jets_train)):
-        y_idx = y[msk_jets_train[idx]]
-        count_prediction = {-1:  np.count_nonzero(y_idx == -1), 1:  np.count_nonzero(y_idx == 1)}
-        ax.bar(ind+w*idx, count_prediction.values(), width=w, color=colors[idx],align='center')
-
-    ax.set_ylabel('Numbers of training data')
-    ax.set_xticks(ind+0.25)
-    ax.set_xticklabels( ('prediction is -1', 'prediction is 1') )
-    ax.legend(legend)
-    ax.plot()
