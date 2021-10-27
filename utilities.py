@@ -67,12 +67,12 @@ def standardize_tX(X):
     """
     Standardization of the whole training dataset
     """
-    N = X.shape[0]
-    D = X.shape[1]
-    for i in range(D):
-        X[:,i] = np.reshape(standardize(X[:,i]),(N,))
+    # N = X.shape[0]
+    # D = X.shape[1]
+    # for i in range(D):
+    #     X[:,i] = np.reshape(standardize(X[:,i]),(N,))
 
-    return X
+    return standardize(X)
 
 def eliminate_outliers(X, a):
     """
@@ -110,6 +110,7 @@ def cross_validation(y, x, k_indices, k, lambda_):
     # calculate the loss for test data:
     e_te = y_te - x_te.dot(w)
     loss_te = 1/(2*len(y_te)) * np.transpose(e_te).dot(e_te)
+    
     return w, loss_tr, loss_te
 
 
@@ -194,3 +195,16 @@ def phi(x, degree):
     x_poly = build_poly(x, degree)
     
     return x_poly
+
+def compute_accuracy(y_pred, y):
+    """Computes accuracy"""
+    total = 0
+    for i, y_val in enumerate(y):
+        if y_val == y_pred[i]:
+            total = total + 1
+
+    return total / len(y)
+
+def get_subset_PRI_jet_num(x, num_jet):
+    """ Returns the rows whose PRI_jet_num (feature in col 22) is equal to num_jet """
+    return np.where(x[:,22] == num_jet)
