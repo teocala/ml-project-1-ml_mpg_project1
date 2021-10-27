@@ -208,3 +208,28 @@ def compute_accuracy(y_pred, y):
 def get_subset_PRI_jet_num(x, num_jet):
     """ Returns the rows whose PRI_jet_num (feature in col 22) is equal to num_jet """
     return np.where(x[:,22] == num_jet)
+
+def k_nearest(x, y, x_test, k):
+    # warnings:
+    # 1) x and x_test must be corrected from missing data and standardized (other l^2 norm is unbalanced)
+    # 2) k must be odd (otherwise doubt choice when k/2 vs k/2)
+    # 3) y must be made of {0,1}
+
+    n = x_test.shape[0]
+    y_test = np.zeros(n)
+
+    for i in range(n):
+        norms = np.linalg.norm(x-x_test[i,:], axis=1)
+        nearest_ids = norms.argsort()[:k]
+        nearest_mean = y[nearest_ids].mean()
+        if (nearest_mean >= 0.5):
+            y_test[i] = 1
+        else:
+            y_test[i] = 0
+
+        print ('Step ', i, ' of ', n) #it's indeed veeeery loooong
+
+    return y_test
+
+
+
