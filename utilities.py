@@ -40,6 +40,15 @@ def missing_values_correction(X):
     return X
 
 
+def missing_values_correction_Giulia(X,cols_to_delete):
+    """
+    Elimination of columns with missing terms
+    """
+    X = np.delete(X, cols_to_delete, axis = 1)
+
+    return X
+
+
 def normalize(X):
     """
     Normalization of the features values by division by the maximum value for each feature
@@ -208,3 +217,49 @@ def compute_accuracy(y_pred, y):
 def get_subset_PRI_jet_num(x, num_jet):
     """ Returns the rows whose PRI_jet_num (feature in col 22) is equal to num_jet """
     return np.where(x[:,22] == num_jet)
+
+def k_nearest(x, y, x_test, k):
+    # warnings:
+    # 1) x and x_test must be corrected from missing data and standardized (other l^2 norm is unbalanced)
+    # 2) k must be odd (otherwise doubt choice when k/2 vs k/2)
+    # 3) y must be made of {0,1}
+
+    n = x_test.shape[0]
+    y_test = np.zeros(n)
+
+    for i in range(n):
+        norms = np.linalg.norm(x-x_test[i,:], axis=1)
+        nearest_ids = norms.argsort()[:k]
+        nearest_mean = y[nearest_ids].mean()
+        if (nearest_mean >= 0.5):
+            y_test[i] = 1
+        else:
+            y_test[i] = 0
+
+        print ('Step ', i, ' of ', n) #it's indeed veeeery loooong
+
+    return y_test
+
+def plot_labels_in_training(y,tX):
+    msk_jets_train = {
+        0: tX[:, 22] == 0,
+        1: tX[:, 22] == 1,
+        2: tX[:, 22] == 2, 
+        3: tX[:, 22] == 3
+        }
+
+    ax = plt.subplot(111)
+    colors = ['b','g','r','y']
+    legend = ['class: 0','class: 1','class: 2','class: 3']
+    ind = np.array([-1,  1])
+    w = 0.25
+    for idx in range(len(msk_jets_train)):
+        y_idx = y[msk_jets_train[idx]]
+        count_prediction = {-1:  np.count_nonzero(y_idx == -1), 1:  np.count_nonzero(y_idx == 1)}
+        ax.bar(ind+w*idx, count_prediction.values(), width=w, color=colors[idx],align='center')
+
+    ax.set_ylabel('Numbers of training data')
+    ax.set_xticks(ind+0.25)
+    ax.set_xticklabels( ('prediction is -1', 'prediction is 1') )
+    ax.legend(legend)
+    ax.plot()
