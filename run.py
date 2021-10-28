@@ -133,7 +133,7 @@ if __name__ == '__main__':
     
     DATA_SOL_PATH = '../data/true_solutions.csv'
 
-    y = np.genfromtxt(DATA_TRAIN_PATH, delimiter=",", skip_header=1, dtype=str, usecols=-3)
+    y = np.genfromtxt(DATA_SOL_PATH, delimiter=",", skip_header=1, dtype=str, usecols=-3)
     yb = np.ones(len(y))
     yb[np.where(y == 'b')] = -1
     y_true = yb[-len(y_pred):]
