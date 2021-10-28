@@ -73,15 +73,15 @@ if __name__ == '__main__':
 
         """ Correction of the training data """
         y [y < 0] = 0
-        tX, D_del, cols_deleted, cols_kept = missing_values_elimination(tX)
-        # for num_jet = 0, the last column contains only zeros
-        if num_jet == 0:
-            tX = np.delete(tX, -1, axis = 1)
-            cols_kept = np.delete(cols_kept, -1)
-
+        
+        tX = missing_values_elimination(tX)
+        
+        tX = log_transform(tX)
+        tX = symmetric_transform(tX)
         tX = standardize_tX(tX)
+        tX = np.delete(tX, [15,16,18,20], 1)
         tX = eliminate_outliers(tX, alpha)
-        tX = build_poly2_with_pairs(tX)
+        tX = build_poly(tX,degree)
 
         """ Analysis of the features distributions for the current jet """
 
@@ -95,7 +95,8 @@ if __name__ == '__main__':
 
         """ Logistic regression on the training set with polynomial expansion"""
         #weights = np.zeros(tX.shape[1] * degree + 1)
-        initial_w = least_squares(y,tX)[0]
+        #initial_w = least_squares(y,tX)[0]
+        initial_w = np.zeros(tX.shape[1])
         loss, weights_hat = logistic_regression(y, tX, initial_w, maxiter, gamma)
         
         # new_cols_kept = [0] 
@@ -121,11 +122,12 @@ if __name__ == '__main__':
         # weights[cols_kept] = weights_hat
 
         """ Correction of the test data """
-        tX_jt = missing_values_correction_Giulia(tX_jt, cols_deleted)
-        if num_jet == 0:
-            tX_jt = np.delete(tX_jt, -1, axis = 1)
+        tX_jt = missing_values_elimination(tX_jt)
+        tX_jt = symmetric_transform(tX_jt)
+        tX_jt = log_transform(tX_jt)
+        tX_jt = np.delete(tX_jt, [15,16,18,20], 1)
         tX_jt = standardize_tX(tX_jt)
-        tX_jt = build_poly2_with_pairs(tX_jt)
+        tX_jt = build_poly(tX_jt, degree)
 
         """ Prection for the current jet_num """
         y_pred[j_test] = predict_labels(weights_hat, tX_jt)

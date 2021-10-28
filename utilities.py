@@ -20,10 +20,9 @@ def missing_values_elimination(X):
             median = np.median(X_feature[X_feature != -999])
             X[:,i] = np.where(X[:,i]==-999, median, X[:,i])
 
-    cols_to_keep = list(set(range(D)).difference(set(cols_to_delete)))
-    X = np.delete(X, cols_to_delete, axis = 1)
-    D_del = X.shape[1]
-    return X,D_del,cols_to_delete,cols_to_keep
+    X[:,cols_to_delete]=0
+        
+    return X
 
 def missing_values_correction(X):
     """
@@ -289,3 +288,20 @@ def plot_labels_in_training(y,tX):
     ax.set_xticklabels( ('prediction is -1', 'prediction is 1') )
     ax.legend(legend)
     ax.plot()
+    
+def log_transform(x):
+    """ Logaritmic transformation for positive features x, substitute x with log(1+x)"""
+    # The indexes of positive features are identified by plot analysis
+    idx = [0,1,2,5,7,9,10,13,16,19,21,23,26]
+    x_t1 = np.log1p(x[:, idx]) 
+    x = np.hstack((x, x_t1))
+    
+    return x 
+
+def symmetric_transform(x):
+    """Absolute value of symmetrical features"""
+    # The indexes of symmetrical features are identified by plot analysis
+    idx = [14,17,24,27]
+    x[:,idx]= abs(x[:,idx])  
+    
+    return x
