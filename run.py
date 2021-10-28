@@ -62,6 +62,8 @@ if __name__ == '__main__':
     # We will not need the 22-th feature in the dataset anymore
     tX_train = np.delete(tX_train, 22, axis = 1)
     tX_test = np.delete(tX_test, 22, axis = 1)
+    
+    lambda_ = np.zeros(4)
 
     for num_jet in range(4):
         j = jets[num_jet]
@@ -120,6 +122,11 @@ if __name__ == '__main__':
         # initial_w = least_squares(y,tX)[0]
         # loss, weights_hat = reg_logistic_regression(y, tX, lambda_, initial_w, maxiter, gamma)
         # weights[cols_kept] = weights_hat
+        
+        """ Ridge Regression """
+        initial_w = np.zeros(D)
+        maxiter = 100
+        lambda_[num_jet] = choose_lambda_ridge(y, tX, initial_w, maxiter, gamma)
 
         """ Correction of the test data """
         tX_jt = missing_values_elimination(tX_jt)

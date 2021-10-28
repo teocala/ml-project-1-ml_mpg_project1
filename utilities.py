@@ -183,6 +183,32 @@ def choose_lambda_logistic(y,tX, initial_w, maxiter, gamma):
     plot_train_test(rmse_tr, rmse_te, lambdas)
     return lambdas[np.argmin(rmse_te)]
 
+def choose_lambda_ridge(y,tX, initial_w, maxiter, gamma):
+    seed = 1
+    k_fold = 4
+    lambdas = np.logspace(-6, 0, 20)
+
+    # splitting data in k fold
+    k_indices = build_k_indices(y, k_fold, seed)
+
+    rmse_tr = []
+    rmse_te = []
+
+    for i in range(len(lambdas)):
+        lambda_ = lambdas[i]
+        tr_loss = 0
+        te_loss = 0
+        for k in range(k_fold):
+            loss_tr, loss_te = cross_validation(y, tX, k_indices, k, lambda_)[1:]
+            tr_loss = tr_loss + loss_tr
+            te_loss = te_loss + loss_te
+        rmse_tr.append(np.sqrt(2 * tr_loss/k_fold))
+        rmse_te.append(np.sqrt(2 * te_loss/k_fold))
+    print(rmse_te)
+    print(rmse_tr)
+    plot_train_test(rmse_tr, rmse_te, lambdas)
+    return lambdas[np.argmin(rmse_te)]
+
 def build_poly(x, degree):
     """polynomial basis functions for input data x, for j=0 up to j=degree."""
     N, D = x.shape
