@@ -37,10 +37,10 @@ if __name__ == '__main__':
     alpha = 0.1
     maxiter = 5000
     gamma = 1
-    #degree = 3
+    degree = 2
 
     """ Exploratory plot """
-    plot_labels_in_training(y_train,tX_train)
+    #plot_labels_in_training(y_train,tX_train)
 
     """ Splitting of training and test data according to the categorical feature PRI_jet_num """
 
@@ -77,26 +77,28 @@ if __name__ == '__main__':
         # for num_jet = 0, the last column contains only zeros
         if num_jet == 0:
             tX = np.delete(tX, -1, axis = 1)
+            cols_kept = np.delete(cols_kept, -1)
 
         tX = standardize_tX(tX)
         tX = eliminate_outliers(tX, alpha)
-        #tX = phi(tX, degree)
+        tX = phi(tX, degree)
 
         """ Analysis of the features distributions for the current jet """
 
 
-        """ Logistic regression on the training set"""
-        weights = np.zeros(tX.shape[1])
-        initial_w = least_squares(y,tX)[0]
-        loss, weights_hat = logistic_regression(y, tX, initial_w, maxiter, gamma)
-        weights = weights_hat
-
-
-        # """ Logistic regression on the training set with polynomial expansion"""
-        # weights = np.zeros(D * degree + 1)
+        # """ Logistic regression on the training set"""
+        # weights = np.zeros(tX.shape[1])
         # initial_w = least_squares(y,tX)[0]
         # loss, weights_hat = logistic_regression(y, tX, initial_w, maxiter, gamma)
-        # new_cols_kept = [0] ### where to put the intercept???
+        # weights = weights_hat
+
+
+        """ Logistic regression on the training set with polynomial expansion"""
+        weights = np.zeros(tX.shape[1] * degree + 1)
+        initial_w = least_squares(y,tX)[0]
+        loss, weights_hat = logistic_regression(y, tX, initial_w, maxiter, gamma)
+        
+        # new_cols_kept = [0] 
         # for i in range(0,degree):
         #     cols_new = np.array(cols_kept) + (i * D + 1)
         #     cols_new = cols_new.tolist()
@@ -120,11 +122,13 @@ if __name__ == '__main__':
 
         """ Correction of the test data """
         tX_jt = missing_values_correction_Giulia(tX_jt, cols_deleted)
+        if num_jet == 0:
+            tX_jt = np.delete(tX_jt, -1, axis = 1)
         tX_jt = standardize_tX(tX_jt)
-        #tX_jt = phi(tX_jt, degree)
+        tX_jt = phi(tX_jt, degree)
 
         """ Prection for the current jet_num """
-        y_pred[j_test] = predict_labels(weights, tX_jt)
+        y_pred[j_test] = predict_labels(weights_hat, tX_jt)
         #y_pred[j_test] = k_nearest(tX, y, tX_jt, 9)
 
 
@@ -138,7 +142,7 @@ if __name__ == '__main__':
     yb[np.where(y == 'b')] = -1
     y_true = yb[-len(y_pred):]
 
-    accuracy = np.count_nonzero(y_vere == y_pred)/len(y_pred)
+    accuracy = np.count_nonzero(y_true == y_pred)/len(y_pred)
     
     """ Creation of the submission file """
     OUTPUT_PATH = '../data/submission.csv'
