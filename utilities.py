@@ -119,7 +119,7 @@ def cross_validation(y, x, k_indices, k, lambda_):
     # calculate the loss for test data:
     e_te = y_te - x_te.dot(w)
     loss_te = 1/(2*len(y_te)) * np.transpose(e_te).dot(e_te)
-    
+
     return w, loss_tr, loss_te
 
 
@@ -146,7 +146,7 @@ def plot_train_test(train_errors, test_errors, lambdas):
     * lambda[0] = 1
     * train_errors[0] = RMSE of a logistic regression on the train set
     * test_errors[0] = RMSE of the parameter found by logistic regression applied on the test set
-    
+
     degree is just used for the title of the plot.
     """
     plt.semilogx(lambdas, train_errors, color='b', marker='*', label="Train error")
@@ -173,7 +173,7 @@ def choose_lambda_logistic(y,tX, initial_w, maxiter, gamma):
         lambda_ = lambdas[i]
         tr_loss = 0
         te_loss = 0
-        for k in range(k_fold): 
+        for k in range(k_fold):
             loss_tr, loss_te = cross_validation_logistic(y, tX, k_indices, k, lambda_, initial_w, maxiter, gamma)[1:]
             tr_loss = tr_loss + loss_tr
             te_loss = te_loss + loss_te
@@ -181,20 +181,20 @@ def choose_lambda_logistic(y,tX, initial_w, maxiter, gamma):
         rmse_te.append(np.sqrt(2 * te_loss/k_fold))
     print(rmse_te)
     print(rmse_tr)
-    plot_train_test(rmse_tr, rmse_te, lambdas) 
+    plot_train_test(rmse_tr, rmse_te, lambdas)
     return lambdas[np.argmin(rmse_te)]
 
 def build_poly(x, degree):
     """polynomial basis functions for input data x, for j=0 up to j=degree."""
-    N, D = x.shape    
+    N, D = x.shape
     poly_basis = np.zeros(shape = (N, 1+D*(degree)))
 
     poly_basis[:,0] = np.ones(N)
 
     for deg in range(1,degree+1):
         for i in range(D):
-            poly_basis[:, 1+D*(deg-1)+i ] = np.power(x[:,i],deg)      
-    
+            poly_basis[:, 1+D*(deg-1)+i ] = np.power(x[:,i],deg)
+
     return poly_basis
 
 def phi(x, degree):
@@ -202,7 +202,7 @@ def phi(x, degree):
     Transformation of X matrix with polynomial expansion of given degree
     """
     x_poly = build_poly(x, degree)
-    
+
     return x_poly
 
 def compute_accuracy(y_pred, y):
@@ -234,7 +234,7 @@ def k_nearest(x, y, x_test, k):
         if (nearest_mean >= 0.5):
             y_test[i] = 1
         else:
-            y_test[i] = 0
+            y_test[i] = -1
 
         print ('Step ', i, ' of ', n) #it's indeed veeeery loooong
 
@@ -244,7 +244,7 @@ def plot_labels_in_training(y,tX):
     msk_jets_train = {
         0: tX[:, 22] == 0,
         1: tX[:, 22] == 1,
-        2: tX[:, 22] == 2, 
+        2: tX[:, 22] == 2,
         3: tX[:, 22] == 3
         }
 
@@ -263,4 +263,3 @@ def plot_labels_in_training(y,tX):
     ax.set_xticklabels( ('prediction is -1', 'prediction is 1') )
     ax.legend(legend)
     ax.plot()
-

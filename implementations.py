@@ -8,20 +8,20 @@ import matplotlib.pyplot as plt
 # Methods from LAB 2
 
 def compute_loss_MSE(y, tx, w):
-    
+
     """
     Computes the loss function using the Mean Squared Error as Cost
     INPUTS: y = target, tx = sample matrix, w = weights vector
     OUTPUT: evaluation of the MSE given the inputs
     """
-    
+
     e = y - tx @ w
     N = len(y)
     return (e**2).sum()/(2*N)
 
 
 def compute_gradient_MSE(y, tx, w):
-    
+
     """
     Computes the gradient of the Loss function with MSE
     INPUTS: y = target, tx = sample matrix, w = weights vector
@@ -34,13 +34,13 @@ def compute_gradient_MSE(y, tx, w):
 
 
 def least_squares_GD(y, tx, initial_w, max_iters, gamma):
-    
+
     """
-    Gradient Descent algorithm  using MSE as Cost 
+    Gradient Descent algorithm  using MSE as Cost
     INPUTS: y = target, tx = sample matrix, w = intial guess for the weights vector, max_iters = maximum number of iterations, gamma = learning rate
     OUTPUT: w = weight vector computed with GD after max_iters iterations, loss = loss evaluation at w
     """
-    
+
     w = initial_w
     for n_iter in range(max_iters):
         w = w - gamma*compute_gradient_MSE(y,tx,w)
@@ -48,9 +48,9 @@ def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     return w,loss
 
 def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
-    
+
     # Auxiliary function for least_squares_SGD
-    
+
     """
     Generate a minibatch iterator for a dataset.
     Takes as input two iterables (here the output desired values 'y' and the input data 'tx')
@@ -78,7 +78,7 @@ def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
 
 
 def least_squares_SGD(y, tx, initial_w, max_iters, gamma, batch_size = 1):
-    
+
     """
     Stochastic Gradient Descent algorithm
     INPUTS: y = target, tx = sample matrix, initial_w = intial guess for the weights vector, batch_size = number of samples on which the new gradient is computed (by default = 1), max_iters = maximum number of iterations, gamma = learning rate
@@ -99,26 +99,26 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma, batch_size = 1):
 # Methods from LAB 3
 
 def least_squares(y, tx):
-    
+
     """
     Computation of the weights vector by solving the normal equations for linear regression
     INPUTS: y = target, tx = sample matrix
     OUTPUTS: w = weights vector, loss = corresponding MSE evaluation
     """
-    
+
     w = np.linalg.solve(tx.T @ tx, tx.T @ y)
     loss = compute_loss_MSE(y,tx,w)
     return w,loss
 
 
 def ridge_regression(y, tx, lambda_):
-    
+
     """
     Computation of the weights vector by solving the L2-regularized normal equations for linear regression
     INPUTS: y = target, tx = sample matrix, lambda_ = regularization parameter
     OUTPUTS: w = weights vector, loss = corresponding MSE evaluation
     """
-    
+
     N = len(y)
     D = tx.shape[1]
     I = np.eye(D)
@@ -167,7 +167,7 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
         loss = compute_loss_logistic(y,tx,w)
         g = compute_gradient_logistic(y,tx,w)
         w = w - gamma*g
-    print(loss)
+    print("Logistic loss = ", loss)
     return loss, w
 
 
