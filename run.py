@@ -128,6 +128,18 @@ if __name__ == '__main__':
         #y_pred[j_test] = k_nearest(tX, y, tX_jt, 9)
 
 
+
+    """ Accuracy of the result """
+    
+    DATA_SOL_PATH = '../data/true_solutions.csv'
+
+    y = np.genfromtxt(DATA_TRAIN_PATH, delimiter=",", skip_header=1, dtype=str, usecols=-3)
+    yb = np.ones(len(y))
+    yb[np.where(y == 'b')] = -1
+    y_true = yb[-len(y_pred):]
+
+    accuracy = np.count_nonzero(y_vere == y_pred)/len(y_pred)
+    
     """ Creation of the submission file """
     OUTPUT_PATH = '../data/submission.csv'
     create_csv_submission(ids_test, y_pred, OUTPUT_PATH)
