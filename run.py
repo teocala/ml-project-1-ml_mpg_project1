@@ -81,7 +81,7 @@ if __name__ == '__main__':
 
         tX = standardize_tX(tX)
         tX = eliminate_outliers(tX, alpha)
-        tX = phi(tX, degree)
+        tX = build_poly2_with_pairs(tX)
 
         """ Analysis of the features distributions for the current jet """
 
@@ -94,7 +94,7 @@ if __name__ == '__main__':
 
 
         """ Logistic regression on the training set with polynomial expansion"""
-        weights = np.zeros(tX.shape[1] * degree + 1)
+        #weights = np.zeros(tX.shape[1] * degree + 1)
         initial_w = least_squares(y,tX)[0]
         loss, weights_hat = logistic_regression(y, tX, initial_w, maxiter, gamma)
         
@@ -125,7 +125,7 @@ if __name__ == '__main__':
         if num_jet == 0:
             tX_jt = np.delete(tX_jt, -1, axis = 1)
         tX_jt = standardize_tX(tX_jt)
-        tX_jt = phi(tX_jt, degree)
+        tX_jt = build_poly2_with_pairs(tX_jt)
 
         """ Prection for the current jet_num """
         y_pred[j_test] = predict_labels(weights_hat, tX_jt)
@@ -143,6 +143,7 @@ if __name__ == '__main__':
     y_true = yb[-len(y_pred):]
 
     accuracy = np.count_nonzero(y_true == y_pred)/len(y_pred)
+    print("Accuracy =", accuracy)
     
     """ Creation of the submission file """
     OUTPUT_PATH = '../data/submission.csv'

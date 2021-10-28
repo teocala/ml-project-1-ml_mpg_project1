@@ -190,11 +190,37 @@ def build_poly(x, degree):
     poly_basis = np.zeros(shape = (N, 1+D*(degree)))
 
     poly_basis[:,0] = np.ones(N)
-
+    
     for deg in range(1,degree+1):
         for i in range(D):
             poly_basis[:, 1+D*(deg-1)+i ] = np.power(x[:,i],deg)
 
+    return poly_basis
+
+def build_poly2_with_pairs(x):
+    N, D = x.shape
+    temp_dict = {}
+    count = 0
+    
+    for i in range(D):
+        for j in range(i+1,D):
+            temp = x[:,i]*x[:,j]
+            temp_dict[count] = [temp]
+            count = count + 1
+            
+    poly_basis = np.zeros(shape = (N, 1+2*D+count))
+    
+    poly_basis[:,0] = np.ones(N)
+    
+    
+    for n in range(D):
+        poly_basis[:, 1+n ] = np.power(x[:,n],1)
+        poly_basis[:, 1+D+n] = np.power(x[:,n],2)
+        
+        
+    for m in range(count):
+        poly_basis[:,1+2*D+m] = temp_dict[m][0]
+    
     return poly_basis
 
 def phi(x, degree):
