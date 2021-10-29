@@ -249,3 +249,24 @@ def logistic_regression_SGD(y, tx, initial_w, max_iters, gamma, batch_size = 1):
             g = compute_gradient_logistic(y_batch,tx_batch,w)
             w = w - gamma*g
     return loss,w
+
+
+proximal_operator_l1 = lambda x, lambda_, alpha: np.maximum(np.abs(x)-alpha*lambda_,0)*np.sign(x)
+
+
+def fista(y, tx, initial_w, max_iters, gamma, lambda_):
+
+    z = w = initial_w
+    t = 1.0
+
+    for k in range(max_iters):
+        g = compute_gradient_logistic(y,tx,z)
+        w_new = proximal_operator_l1(z-gamma*g,lambda_, gamma)
+        t_new = (1.0 + np.sqrt(4.0*(t**2) + 1.0))/2.0
+        z = w_new + (t-1)*(w_new-w)/t_new
+
+        w = w_new
+        t = t_new
+    loss = compute_loss_l1_logistic(y, tx, w, lambda_)
+
+    return loss,w

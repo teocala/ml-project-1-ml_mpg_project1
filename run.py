@@ -122,6 +122,7 @@ if __name__ == '__main__':
         # weights = np.zeros(D)
         # initial_w = least_squares(y,tX)[0]
         loss, weights_hat = l1_logistic_regression(y, tX, lambda_, initial_w, maxiter, gamma)
+        #loss, weights_hat = fista(y, tX, initial_w, maxiter, gamma, lambda_)
         weights = weights_hat
 
         # """ Ridge Regression """
