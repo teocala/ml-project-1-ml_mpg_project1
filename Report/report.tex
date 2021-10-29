@@ -5,91 +5,53 @@
 
 
 \begin{document}
-\title{Writing Scientific Papers and Software}
+\title{The Higgs Boson Machine Learning Challenge}
 
 \author{
-  Cheng Soon Ong\\
-  \textit{Department of Computer Science, ETH Zurich, Switzerland}
+  Matteo Calafà, Giulia Mescolini, Paolo Motta\\
+  \textit{First Project for the course "Machine Learning" at EPFL Lausanne, Switzerland}
 }
 
 \maketitle
 
 \begin{abstract}
-  A critical part of scientific discovery is the
-  communication of research findings to peers or the general public.
-  Mastery of the process of scientific communication improves the
-  visibility and impact of research. While this guide is a necessary
-  tool for learning how to write in a manner suitable for publication
-  at a scientific venue, it is by no means sufficient, on its own, to
-  make its reader an accomplished writer. 
-  This guide should be a starting point for further development of 
-  writing skills.
+ The report contains a proposal of solution for the Higgs Boson Machine Learning Challenge, proposed in the framework of the course "Machine Learning" at EPFL Lausanne. Several algorithms are presented to approach this classification problem on CERN particle accelerator data.
 \end{abstract}
 
 \section{Introduction}
 
-The aim of writing a paper is to infect the mind of your reader with
-the brilliance of your idea~\cite{jones08}. 
-The hope is that after reading your
-paper, the audience will be convinced to try out your idea. In other
-words, it is the medium to transport the idea from your head to your
-reader's head. 
-In the following
-section, we show a common structure of scientific papers and briefly
-outline some tips for writing good papers in
-Section~\ref{sec:tips-writing}.
+The goal of the challenge is to estimate the likelihood that a given event's signature is the result of a Higgs boson or of some other process/particle, because, rather than observing the boson directly, scientists measure the products that result from its decay process, which may be similar to other particles' ones. \\
+In section~\ref{preprocessing}, we present the analysis of the database and the meticulous preprocessing; afterwards, in section~\ref{models}, we present the models built with the 6 requested algorithms and the selection of the best hyper-parameters; afterwards, in section~\ref{results}, we illustrate their performance.
 
-At that
-point, it is important that the reader is able to reproduce your
-work~\cite{schwab00,wavelab,gentleman05}. This is why it is also
-important that if the work has a computational component, the software
-associated with producing the results are also made available in a
-useful form. Several guidelines for making your user's experience with
-your software as painless as possible is given in
-Section~\ref{sec:tips-software}.
+\section{Preprocessing}
+\label{preprocessing}
 
-This brief guide is by no means sufficient, on its own, to
-make its reader an accomplished writer. The reader is urged to use the
-references to further improve his or her writing skills.
+\subsection{First Analysis of the Dataset}
+The dataset contains 250000 points for training and 568238 for testing, with 30 features and their corresponding binary labels ("-1" for "background" and "1" for "signal"), which clearly have to be predicted in the case of the test set. \\
+First of all, we noticed that one feature, \emph{PRI\_jet\_num}, is the only one to be categorical; it represents the number of jets (showers of hadrons originating from a quark and a gluon, clustered together after being produced in a particle collision) and it ranges from 0 to 3. Inspired by the challenge documentation, we noticed that some features are meaningless for some numbers of jets, therefore we split the dataset into 4 subclasses, each one characterized by a different \emph{PRI\_jet\_num}.
 
-\section{The Structure of a Paper}
-\label{sec:structure-paper}
+\subsection{Management of Missing Values}
+From the documentation, we know that each "-999" present in the dataset represents a missing value; if for a feature more than the 70 \% of data is missing, we decide not to consider it, while the remaining missing values are substituted by the median of the feature, which is, according to theory, a robust estimator.
 
-Scientific papers usually begin with the description of the problem,
-justifying why the problem is interesting. Most importantly, it argues
-that the problem is still unsolved, or that the current solutions are
-unsatisfactory. This leads to the main gist of the paper, which is
-``the idea''. The authors then show evidence, using derivations or
-experiments, that the idea works. Since science does not occur in a
-vacuum, a proper comparison to the current state of the art is often
-part of the results. Following these ideas, papers usually have the
-following structure:
-\begin{description}
-\item[Abstract] \ \\
-  Short description of the whole paper, to help the
-  reader decide whether to read it.
-\item[Introduction] \ \\
-  Describe your problem and state your
-  contributions.
-\item[Models and Methods] \ \\
-  Describe your idea and how it was implemented to solve
-  the problem. Survey the related work, giving credit where credit is
-  due.
-\item[Results] \ \\
-  Show evidence to support your claims made in the
-  introduction.
-\item[Discussion] \ \\
-  Discuss the strengths and weaknesses of your
-  approach, based on the results. Point out the implications of your
-  novel idea on the application concerned.
-\item[Summary] \ \\
-  Summarize your contributions in light of the new
-  results.
-\end{description}
+\subsection{Standardization}
+In order to ensure a good functioning of the numeric optimization, it is a good practice to standardize the dataset: we subtract from each feature its mean and divide by its standard deviation.
+This helps the feature matrix in having a better condition number.
 
+\subsection{Feature Engineering}
+We plot the features and ideate strategies to deal with their peculiarities.
+\begin{itemize}
+    \item \textbf{Logaritmic transform:}
+    \item \textbf{Useless features:}
+    \item \textbf{Angles:}
+\end{itemize}
 
-\section{Tips for Good Writing}
-\label{sec:tips-writing}
+\subsection{Polynomial Feature Expansion}
+
+\subsection{Management of Outliers}
+To deal with the presence of outliers, we fix $\alpha = 0.1$ and decide to cap the extreme values of each feature to the $\alpha$-quantile (for the lower tail) and to the 1-$alpha$-quantile (for the upper tail).
+
+\section{Models and Methods}
+\label{models}
 
 The ideas for good writing have come
 from~\cite{editor10,jones08,anderson04}.
@@ -210,8 +172,8 @@ report the mean (average value) along with a measure of variability
 (standard deviation(s) or standard error of the mean).
 
 
-\section{Tips for Good Software}
-\label{sec:tips-software}
+\section{Results}
+\label{results}
 
 There is a lot of literature (for example~\cite{hunt99pragmatic} and
 \cite{spolsky04software}) on how to write software. It is not the
@@ -300,7 +262,7 @@ figure or table to span both columns.
 
 
 
-\section{Summary}
+\section{Conclusion}
 
 The aim of a scientific paper is to convey the idea or discovery of
 the researcher to the minds of the readers. The associated software
@@ -318,3 +280,5 @@ suggestions.
 \bibliography{literature}
 
 \end{document}
+
+
