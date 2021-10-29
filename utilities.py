@@ -121,6 +121,24 @@ def cross_validation(y, x, k_indices, k, lambda_):
 
     return w, loss_tr, loss_te
 
+def cross_validation_degree(y, x, k_indices, k, lambda_, degree):
+    """return the loss of ridge regression."""
+    # get k'th subgroup in test, others in train:
+    ind = k_indices[k,:]
+    x_te = x[ind]
+    y_te = y[ind]
+    ind_tr = np.delete(k_indices, (k), axis = 0)
+    x_tr = np.vstack(x[ind_tr])
+    y_tr = np.hstack(y[ind_tr])
+    x_tr = build_poly(x_tr,degree)
+    x_te = build_poly(x_te,degree)
+    # ridge regression:
+    w, loss_tr = ridge_regression(y_tr, x_tr, lambda_)
+    # calculate the loss for test data:
+    e_te = y_te - x_te.dot(w)
+    loss_te = 1/(2*len(y_te)) * np.transpose(e_te).dot(e_te)
+
+    return w, loss_tr, loss_te
 
 def cross_validation_logistic(y, x, k_indices, k, lambda_, initial_w, max_iters, gamma):
     """return the loss of ridge regression."""
@@ -134,6 +152,26 @@ def cross_validation_logistic(y, x, k_indices, k, lambda_, initial_w, max_iters,
     y_tr = y[ind_tr]
     # ridge regression:
     loss_tr, w = reg_logistic_regression(y_tr, x_tr, lambda_, initial_w, max_iters, gamma)
+    # calculate the loss for test data:
+    loss_tr = compute_loss_logistic(y_tr, x_tr, w)
+    loss_te = compute_loss_logistic(y_te, x_te, w)
+    return w, loss_tr, loss_te
+
+def cross_validation_logistic_degree(y, x, k_indices, deg, k, max_iters, gamma):
+    """return the loss of ridge regression."""
+    # get k'th subgroup in test, others in train:
+    ind = k_indices[k,:]
+    x_te = x[ind]
+    y_te = y[ind]
+    ind_tr = np.delete(k_indices, (k), axis = 0)
+    ind_tr = np.hstack(ind_tr)
+    x_tr = x[ind_tr]
+    y_tr = y[ind_tr]
+    x_tr = build_poly(x_tr,deg)
+    x_te = build_poly(x_te,deg)
+    # ridge regression:
+    initial_w = np.zeros(x_tr.shape[1])
+    loss_tr, w = logistic_regression(y_tr, x_tr, initial_w, max_iters, gamma)
     # calculate the loss for test data:
     loss_tr = compute_loss_logistic(y_tr, x_tr, w)
     loss_te = compute_loss_logistic(y_te, x_te, w)
@@ -183,6 +221,33 @@ def choose_lambda_logistic(y,tX, initial_w, maxiter, gamma):
     plot_train_test(rmse_tr, rmse_te, lambdas)
     return lambdas[np.argmin(rmse_te)]
 
+def choose_degree_logistic(y,tX, maxiter, gamma):
+    seed = 1
+    k_fold = 4
+    degrees = [1,2,3,4,5,6,7]
+
+    # splitting data in k fold
+    k_indices = build_k_indices(y, k_fold, seed)
+
+    rmse_tr = []
+    rmse_te = []
+
+    for i in range(len(degrees)):
+        deg = degrees[i]
+        tr_loss = 0
+        te_loss = 0
+        for k in range(k_fold):
+            initial_w = np.zeros(tX.shape[1])
+            loss_tr, loss_te = cross_validation_logistic_degree(y, tX, k_indices, deg, k, maxiter, gamma)[1:]
+            tr_loss = tr_loss + loss_tr
+            te_loss = te_loss + loss_te
+        rmse_tr.append(np.sqrt(2 * tr_loss/k_fold))
+        rmse_te.append(np.sqrt(2 * te_loss/k_fold))
+    print(rmse_te)
+    print(rmse_tr)
+    plot_train_test(rmse_tr, rmse_te, degrees)
+    return degrees[np.argmin(rmse_te)]
+
 def choose_lambda_ridge(y,tX, initial_w, maxiter, gamma):
     seed = 1
     k_fold = 4
@@ -209,6 +274,33 @@ def choose_lambda_ridge(y,tX, initial_w, maxiter, gamma):
     plot_train_test(rmse_tr, rmse_te, lambdas)
     return lambdas[np.argmin(rmse_te)]
 
+def choose_degree_ridge(y,tX, maxiter, gamma):
+    seed = 1
+    k_fold = 4
+    degrees = [1,2,3,4,5,6,7]
+    lambda_ = 1e-6 # which resulted optimum
+
+    # splitting data in k fold
+    k_indices = build_k_indices(y, k_fold, seed)
+
+    rmse_tr = []
+    rmse_te = []
+
+    for i in range(len(degrees)):
+        deg = degrees[i]
+        tr_loss = 0
+        te_loss = 0
+        for k in range(k_fold):
+            loss_tr, loss_te = cross_validation_degree(y, tX, k_indices, k, lambda_, deg)[1:]
+            tr_loss = tr_loss + loss_tr
+            te_loss = te_loss + loss_te
+        rmse_tr.append(np.sqrt(2 * tr_loss/k_fold))
+        rmse_te.append(np.sqrt(2 * te_loss/k_fold))
+    print(rmse_te)
+    print(rmse_tr)
+    plot_train_test(rmse_tr, rmse_te, degrees)
+    return degrees[np.argmin(rmse_te)]
+
 def build_poly(x, degree):
     """polynomial basis functions for input data x, for j=0 up to j=degree."""
     N, D = x.shape
@@ -219,6 +311,48 @@ def build_poly(x, degree):
     for deg in range(1,degree+1):
         for i in range(D):
             poly_basis[:, 1+D*(deg-1)+i ] = np.power(x[:,i],deg)
+
+    return poly_basis
+
+def root(x,t):
+    """ Compute the th-square of each element of a matrix  """
+    N, D = x.shape
+    r = np.zeros([N,D])
+    for i in range(N):
+        for j in range(D):
+            if x[i,j]>0:
+                r[i,j] = x[i,j]**(1/t)
+            else:
+                r[i,j] = -(-x[i,j])**(1/t)
+    return r 
+
+def build_poly_with_roots(x, degree):
+    """polynomial basis functions for input data x, for j=0 up to j=degree, with square and cubic root also."""
+    N, D = x.shape
+    temp_dict = {}
+    count = 0
+
+    for i in range(D):
+        for j in range(i+1,D):
+            temp = x[:,i]*x[:,j]
+            temp_dict[count] = [temp]
+            count = count + 1
+
+    poly_basis = np.zeros(shape = (N, 1+D*(degree + 2) + count))
+
+    poly_basis[:,0] = np.ones(N)
+
+    for deg in range(1,degree+1):
+        for i in range(D):
+            poly_basis[:, 1+D*(deg-1)+i ] = np.power(x[:,i],deg)
+            
+    for m in range(count):
+        poly_basis[:,1+2*D+m] = temp_dict[m][0]
+            
+    for i in range(D):
+        poly_basis[:, 1+D*degree+count + i] = np.abs(x[:,i])**0.5
+    
+    poly_basis[:,1+D*degree+count+D:] = root(x,3)
 
     return poly_basis
 
@@ -245,6 +379,7 @@ def build_poly2_with_pairs(x):
 
     for m in range(count):
         poly_basis[:,1+2*D+m] = temp_dict[m][0]
+        
 
     return poly_basis
 
@@ -351,3 +486,11 @@ def PCA (tX):
     Z_new = np.dot(Z, eigenvectors)
     fig, ax1 = plt.subplots(1,1)
     print ('PCA eigenvalues = ', eigenvalues)
+    
+def preprocessing(x):
+    x = missing_values_elimination(x)
+    x = log_transform(x)
+    x = angle_transform(x)
+    x = np.delete(x, [15,16,18,20], 1)
+    x = standardize_tX(x)
+    return x

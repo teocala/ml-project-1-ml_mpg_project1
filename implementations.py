@@ -132,8 +132,9 @@ def ridge_regression(y, tx, lambda_):
 
 # Methods from LAB 5
 
-sigmoid = lambda x : 1/(1+np.exp(-x))
 """Sigmoid function for logistic regression"""
+sigmoid = lambda x : 1/(1+np.exp(-x))
+
 
 
 def compute_loss_logistic(y, tx, w):

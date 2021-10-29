@@ -37,7 +37,7 @@ if __name__ == '__main__':
     alpha = 0.1
     maxiter = 5000
     gamma = 1
-    degree = 2
+    #degree = 2
 
     """ Exploratory plot """
     #plot_labels_in_training(y_train,tX_train)
@@ -63,7 +63,9 @@ if __name__ == '__main__':
     tX_train = np.delete(tX_train, 22, axis = 1)
     tX_test = np.delete(tX_test, 22, axis = 1)
 
-    lambda_ = np.zeros(4)
+    #opt_degrees = np.zeros(4)
+    opt_degrees = [2,4,2,3]
+    #lambda_ = 1e-6
 
     for num_jet in range(4):
         j = jets[num_jet]
@@ -71,33 +73,33 @@ if __name__ == '__main__':
         tX = tX_train[j]
         y = y_train[j]
         tX_jt = tX_test[j_test]
+        deg = opt_degrees[num_jet]
 
 
         """ Correction of the training data """
         y [y < 0] = 0
-        tX = missing_values_elimination(tX)
-        tX = log_transform(tX)
-        tX = angle_transform(tX)
-        tX = standardize_tX(tX)
-        tX = np.delete(tX, [15,16,18,20], 1)
+        tX = preprocessing(tX)
         tX = eliminate_outliers(tX, alpha)
-        tX = build_poly(tX,degree)
+        tX = build_poly(tX,deg)
 
         """ Analysis of the features distributions for the current jet """
 
 
-        # """ Logistic regression on the training set"""
-        # weights = np.zeros(tX.shape[1])
-        # initial_w = least_squares(y,tX)[0]
-        # loss, weights_hat = logistic_regression(y, tX, initial_w, maxiter, gamma)
-        # weights = weights_hat
+        """ Logistic regression on the training set"""
+        # # to choose optimal polynomial degrees: [4,5,7,2]
+        # maxiter = 100
+        # opt_degrees[num_jet] = choose_degree_logistic(y, tX, maxiter, gamma)
+        initial_w = np.zeros(tX.shape[1])
+        #initial_w = least_squares(y,tX)[0]
+        loss, weights_hat = logistic_regression(y, tX, initial_w, maxiter, gamma)
+        weights = weights_hat
 
 
         """ Logistic regression on the training set with polynomial expansion"""
         #weights = np.zeros(tX.shape[1] * degree + 1)
         #initial_w = least_squares(y,tX)[0]
-        initial_w = np.zeros(tX.shape[1])
-        loss, weights_hat = logistic_regression(y, tX, initial_w, maxiter, gamma)
+        # initial_w = np.zeros(tX.shape[1])
+        # loss, weights_hat = logistic_regression(y, tX, initial_w, maxiter, gamma)
 
         # new_cols_kept = [0]
         # for i in range(0,degree):
@@ -121,18 +123,18 @@ if __name__ == '__main__':
         # loss, weights_hat = reg_logistic_regression(y, tX, lambda_, initial_w, maxiter, gamma)
         # weights[cols_kept] = weights_hat
 
-        """ Ridge Regression """
-        initial_w = np.zeros(D)
-        maxiter = 100
-        #lambda_[num_jet] = choose_lambda_ridge(y, tX, initial_w, maxiter, gamma)
+        # """ Ridge Regression """
+        # # to choose optimal polynomial degrees: [4,5,7,2]
+        # # maxiter = 100
+        # # opt_degrees[num_jet] = choose_degree_ridge(y, tX, maxiter, gamma)
+        
+        # weights_hat, loss = ridge_regression(y, tX, lambda_)
+        
+        
 
         """ Correction of the test data """
-        tX_jt = missing_values_elimination(tX_jt)
-        tX_jt = log_transform(tX_jt)
-        tX_jt = angle_transform(tX_jt)
-        tX_jt = np.delete(tX_jt, [15,16,18,20], 1)
-        tX_jt = standardize_tX(tX_jt)
-        tX_jt = build_poly(tX_jt, degree)
+        tX_jt = preprocessing(tX_jt)
+        tX_jt = build_poly(tX_jt, deg)
 
         """ Prection for the current jet_num """
         y_pred[j_test] = predict_labels(weights_hat, tX_jt)
