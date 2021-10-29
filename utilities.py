@@ -21,7 +21,7 @@ def missing_values_elimination(X):
             X[:,i] = np.where(X[:,i]==-999, median, X[:,i])
 
     X[:,cols_to_delete]=0
-        
+
     return X
 
 def missing_values_correction(X):
@@ -215,7 +215,7 @@ def build_poly(x, degree):
     poly_basis = np.zeros(shape = (N, 1+D*(degree)))
 
     poly_basis[:,0] = np.ones(N)
-    
+
     for deg in range(1,degree+1):
         for i in range(D):
             poly_basis[:, 1+D*(deg-1)+i ] = np.power(x[:,i],deg)
@@ -226,26 +226,26 @@ def build_poly2_with_pairs(x):
     N, D = x.shape
     temp_dict = {}
     count = 0
-    
+
     for i in range(D):
         for j in range(i+1,D):
             temp = x[:,i]*x[:,j]
             temp_dict[count] = [temp]
             count = count + 1
-            
+
     poly_basis = np.zeros(shape = (N, 1+2*D+count))
-    
+
     poly_basis[:,0] = np.ones(N)
-    
-    
+
+
     for n in range(D):
         poly_basis[:, 1+n ] = np.power(x[:,n],1)
         poly_basis[:, 1+D+n] = np.power(x[:,n],2)
-        
-        
+
+
     for m in range(count):
         poly_basis[:,1+2*D+m] = temp_dict[m][0]
-    
+
     return poly_basis
 
 def phi(x, degree):
@@ -314,20 +314,31 @@ def plot_labels_in_training(y,tX):
     ax.set_xticklabels( ('prediction is -1', 'prediction is 1') )
     ax.legend(legend)
     ax.plot()
-    
+
 def log_transform(x):
     """ Logaritmic transformation for positive features x, substitute x with log(1+x)"""
     # The indexes of positive features are identified by plot analysis
     idx = [0,1,2,5,7,9,10,13,16,19,21,23,26]
-    x_t1 = np.log1p(x[:, idx]) 
+    x_t1 = np.log1p(x[:, idx])
     x = np.hstack((x, x_t1))
-    
-    return x 
+
+    return x
 
 def symmetric_transform(x):
     """Absolute value of symmetrical features"""
     # The indexes of symmetrical features are identified by plot analysis
     idx = [14,17,24,27]
-    x[:,idx]= abs(x[:,idx])  
-    
+    x[:,idx]= abs(x[:,idx])
+
     return x
+
+def PCA (tX):
+    # Only indicative, seems that the last column is the only one negligible
+    Z = tX-np.mean(tX)
+    Z = Z / np.std(Z)
+    Z = np.dot(Z.T, Z)
+    eigenvalues, eigenvectors = np.linalg.eig(Z)
+    D = np.diag(eigenvalues)
+    Z_new = np.dot(Z, eigenvectors)
+    fig, ax1 = plt.subplots(1,1)
+    print ('PCA eigenvalues = ', eigenvalues)
