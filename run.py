@@ -62,7 +62,7 @@ if __name__ == '__main__':
     # We will not need the 22-th feature in the dataset anymore
     tX_train = np.delete(tX_train, 22, axis = 1)
     tX_test = np.delete(tX_test, 22, axis = 1)
-    
+
     lambda_ = np.zeros(4)
 
     for num_jet in range(4):
@@ -75,11 +75,9 @@ if __name__ == '__main__':
 
         """ Correction of the training data """
         y [y < 0] = 0
-        
         tX = missing_values_elimination(tX)
-        
         tX = log_transform(tX)
-        tX = symmetric_transform(tX)
+        tX = angle_transform(tX)
         tX = standardize_tX(tX)
         tX = np.delete(tX, [15,16,18,20], 1)
         tX = eliminate_outliers(tX, alpha)
@@ -100,8 +98,8 @@ if __name__ == '__main__':
         #initial_w = least_squares(y,tX)[0]
         initial_w = np.zeros(tX.shape[1])
         loss, weights_hat = logistic_regression(y, tX, initial_w, maxiter, gamma)
-        
-        # new_cols_kept = [0] 
+
+        # new_cols_kept = [0]
         # for i in range(0,degree):
         #     cols_new = np.array(cols_kept) + (i * D + 1)
         #     cols_new = cols_new.tolist()
@@ -122,16 +120,16 @@ if __name__ == '__main__':
         # initial_w = least_squares(y,tX)[0]
         # loss, weights_hat = reg_logistic_regression(y, tX, lambda_, initial_w, maxiter, gamma)
         # weights[cols_kept] = weights_hat
-        
+
         """ Ridge Regression """
         initial_w = np.zeros(D)
         maxiter = 100
-        lambda_[num_jet] = choose_lambda_ridge(y, tX, initial_w, maxiter, gamma)
+        #lambda_[num_jet] = choose_lambda_ridge(y, tX, initial_w, maxiter, gamma)
 
         """ Correction of the test data """
         tX_jt = missing_values_elimination(tX_jt)
-        tX_jt = symmetric_transform(tX_jt)
         tX_jt = log_transform(tX_jt)
+        tX_jt = angle_transform(tX_jt)
         tX_jt = np.delete(tX_jt, [15,16,18,20], 1)
         tX_jt = standardize_tX(tX_jt)
         tX_jt = build_poly(tX_jt, degree)
@@ -143,7 +141,7 @@ if __name__ == '__main__':
 
 
     """ Accuracy of the result """
-    
+
     DATA_SOL_PATH = '../data/true_solutions.csv'
 
     y = np.genfromtxt(DATA_SOL_PATH, delimiter=",", skip_header=1, dtype=str, usecols=-3)
@@ -153,7 +151,7 @@ if __name__ == '__main__':
 
     accuracy = np.count_nonzero(y_true == y_pred)/len(y_pred)
     print("Accuracy =", accuracy)
-    
+
     """ Creation of the submission file """
     OUTPUT_PATH = '../data/submission.csv'
     create_csv_submission(ids_test, y_pred, OUTPUT_PATH)

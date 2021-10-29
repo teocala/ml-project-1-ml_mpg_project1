@@ -318,7 +318,7 @@ def plot_labels_in_training(y,tX):
 def log_transform(x):
     """ Logaritmic transformation for positive features x, substitute x with log(1+x)"""
     # The indexes of positive features are identified by plot analysis
-    idx = [0,1,2,5,7,9,10,13,16,19,21,23,26]
+    idx = [0,1,2,5,7,9,10,13,16,19,21,22,25]
     x_t1 = np.log1p(x[:, idx])
     x = np.hstack((x, x_t1))
 
@@ -327,8 +327,17 @@ def log_transform(x):
 def symmetric_transform(x):
     """Absolute value of symmetrical features"""
     # The indexes of symmetrical features are identified by plot analysis
-    idx = [14,17,24,27]
+    # To avoid, eta parameters are intentionally symmetrical and the absolute value would lose their meaning
+    idx = [14,17,23,26]
     x[:,idx]= abs(x[:,idx])
+
+    return x
+
+def angle_transform(x):
+    """Tranformation for angles features"""
+    # Physically, these features are measures of angles. Thus, they need to be transformed before the regression
+    idx = [15,18,20,24,27]
+    x[:,idx] = np.cos(x[:,idx])
 
     return x
 
