@@ -203,6 +203,37 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
         w = w - gamma*g
     return loss, w
 
+def compute_loss_l1_logistic(y, tx, w, lambda_):
+    """
+    Computation of the lasso logistic loss (negative log likelihood)
+    INPUTS: y = target, tx = sample matrix, w = weights vector
+    OUTPUTS: evaluation of the loss
+    """
+    return compute_loss_logistic(y,tx,w) + lambda_*np.linalg.norm(w,1)
+
+
+def compute_subgradient_l1_logistic(y, tx, w, lambda_):
+    """
+    Computation of the gradient of the lasso logistic loss (negative log likelihood)
+    INPUTS: y = target, tx = sample matrix, w = weights vector
+    OUTPUTS: evaluation of the gradient of the loss
+    """
+    return compute_gradient_logistic(y,tx,w) + lambda_*np.sign(w)
+
+
+def l1_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
+    """
+    Regularized Lasso Logistic Gradient Descent algorithm
+    INPUTS: y = target, tx = sample matrix, lambda_ = regularization parameter, initial_w = intial guess for the weights vector, max_iters = maximum number of iterations, gamma = learning rate
+    OUTPUT: w = weights vector at last iteration, loss = logistic loss evaluation at last iteration
+    """
+    w = initial_w
+    for iter in range(max_iters):
+        loss = compute_loss_l1_logistic(y,tx,w, lambda_)
+        g = compute_subgradient_l1_logistic(y,tx,w, lambda_)
+        w = w - gamma*g
+    return loss, w
+
 
 def logistic_regression_SGD(y, tx, initial_w, max_iters, gamma, batch_size = 1):
     """

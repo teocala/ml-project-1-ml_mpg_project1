@@ -491,6 +491,6 @@ def preprocessing(x):
     x = missing_values_elimination(x)
     x = log_transform(x)
     x = angle_transform(x)
-    x = np.delete(x, [15,16,18,20], 1)
     x = standardize_tX(x)
+    x = np.delete(x, [15,16,18,20], 1)
     return x

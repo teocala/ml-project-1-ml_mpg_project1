@@ -35,8 +35,9 @@ if __name__ == '__main__':
 
     """ Parameters assignment """
     alpha = 0.1
-    maxiter = 5000
-    gamma = 1
+    maxiter = 2000
+    gamma = 0.1
+    lambda_ = 0.01
     #degree = 2
 
     """ Exploratory plot """
@@ -64,7 +65,7 @@ if __name__ == '__main__':
     tX_test = np.delete(tX_test, 22, axis = 1)
 
     #opt_degrees = np.zeros(4)
-    opt_degrees = [2,4,2,3]
+    opt_degrees = [2,2,2,2]
     #lambda_ = 1e-6
 
     for num_jet in range(4):
@@ -91,8 +92,8 @@ if __name__ == '__main__':
         # opt_degrees[num_jet] = choose_degree_logistic(y, tX, maxiter, gamma)
         initial_w = np.zeros(tX.shape[1])
         #initial_w = least_squares(y,tX)[0]
-        loss, weights_hat = logistic_regression(y, tX, initial_w, maxiter, gamma)
-        weights = weights_hat
+        #loss, weights_hat = logistic_regression(y, tX, initial_w, maxiter, gamma)
+        #weights = weights_hat
 
 
         """ Logistic regression on the training set with polynomial expansion"""
@@ -114,14 +115,14 @@ if __name__ == '__main__':
         # loss, weights_hat = logistic_regression_SGD(y, tX, initial_w, maxiter, gamma)
         # weights[cols_kept] = weights_hat
 
-        # """ Regularized logistic regression """
+        """ Regularized logistic regression """
         # initial_w = least_squares(y,tX)[0]
         # lambda_ = choose_lambda_logistic(y, tX, initial_w, maxiter, gamma)
         # maxiter = 5000
         # weights = np.zeros(D)
         # initial_w = least_squares(y,tX)[0]
-        # loss, weights_hat = reg_logistic_regression(y, tX, lambda_, initial_w, maxiter, gamma)
-        # weights[cols_kept] = weights_hat
+        loss, weights_hat = l1_logistic_regression(y, tX, lambda_, initial_w, maxiter, gamma)
+        weights = weights_hat
 
         # """ Ridge Regression """
         # # to choose optimal polynomial degrees: [4,5,7,2]
