@@ -23,9 +23,9 @@ if __name__ == '__main__':
     #  2) https://www.aicrowd.com/challenges/epfl-machine-learning-higgs
 
     """ Acquisition of train and test data """
-    DATA_TRAIN_PATH = '../data/train.csv'
+    DATA_TRAIN_PATH = 'data/train.csv'
     y_train, tX_train, ids = load_csv_data(DATA_TRAIN_PATH)
-    DATA_TEST_PATH = '../data/test.csv'
+    DATA_TEST_PATH = 'data/test.csv'
     _, tX_test, ids_test = load_csv_data(DATA_TEST_PATH)
     N = len(y_train) # training set cardinality
     D = tX_train.shape[1] # number of parameters ("dimensionality")
@@ -107,7 +107,7 @@ if __name__ == '__main__':
 
     """ Accuracy of the result """
 
-    DATA_SOL_PATH = '../data/true_solutions.csv'
+    DATA_SOL_PATH = 'data/true_solutions.csv'
 
     y = np.genfromtxt(DATA_SOL_PATH, delimiter=",", skip_header=1, dtype=str, usecols=-3)
     yb = np.ones(len(y))
@@ -118,5 +118,5 @@ if __name__ == '__main__':
     print("Accuracy =", accuracy)
 
     """ Creation of the submission file """
-    OUTPUT_PATH = '../data/submission.csv'
+    OUTPUT_PATH = 'data/submission.csv'
     create_csv_submission(ids_test, y_pred, OUTPUT_PATH)

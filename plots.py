@@ -30,8 +30,8 @@ def FeaturesPlot(y,tX,features):
             
 def get_jet_masks(x):
     """
-    Returns 3 masks corresponding to the rows of x where the feature 22 'PRI_jet_num'
-    is equal to 0, 1 and  2 or 3 respectively.
+    Returns 4 masks corresponding to the rows of x where the feature 22 'PRI_jet_num'
+    is equal to 0, 1,2 and 3 respectively.
     """
     return {
         0: x[:, 22] == 0,
@@ -41,6 +41,7 @@ def get_jet_masks(x):
     }
 
 def labels_in_training(y,tX):
+    
     msk_jets_train = get_jet_masks(tX)
 
     ax = plt.subplot(111)
@@ -59,10 +60,10 @@ def labels_in_training(y,tX):
     ax.legend(legend)
     ax.plot()
 
-DATA_TRAIN_PATH = '../data/train.csv'
+DATA_TRAIN_PATH = 'data/train.csv'
 y, tX, ids = load_csv_data(DATA_TRAIN_PATH)
 
-features = np.genfromtxt('../data/train.csv', delimiter=",", dtype=str,max_rows=1)[2:]
+features = np.genfromtxt('data/train.csv', delimiter=",", dtype=str,max_rows=1)[2:]
 
 num_jets_train = get_jet_masks(tX)
 for i in range(len(num_jets_train)):
