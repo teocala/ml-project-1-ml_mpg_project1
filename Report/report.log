@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020/Debian) (preloaded format=pdflatex 2021.8.25)  30 OCT 2021 00:03
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020/Debian) (preloaded format=pdflatex 2021.8.25)  30 OCT 2021 17:21
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -239,31 +239,85 @@ File: pdftex.def 2020/10/05 v1.2a Graphics/color driver for pdftex
 \Gin@req@height=\dimen157
 \Gin@req@width=\dimen158
 )
+(/usr/share/texlive/texmf-dist/tex/latex/caption/caption.sty
+Package: caption 2020/10/26 v3.5g Customizing captions (AR)
+
+(/usr/share/texlive/texmf-dist/tex/latex/caption/caption3.sty
+Package: caption3 2020/10/21 v2.2e caption3 kernel (AR)
+\captionmargin=\dimen159
+\captionmargin@=\dimen160
+\captionwidth=\dimen161
+\caption@tempdima=\dimen162
+\caption@indent=\dimen163
+\caption@parindent=\dimen164
+\caption@hangindent=\dimen165
+Package caption Info: Unknown document class (or package),
+(caption)             standard defaults will be used.
+Package caption Info: \@makecaption = \long macro:#1#2->\ifx \@captype \@IEEEta
+blestring \footnotesize \begin {center}{\normalfont \footnotesize #1}\\{\normal
+font \footnotesize \scshape #2}\end {center}\@IEEEtablecaptionsepspace \else \@
+IEEEfigurecaptionsepspace \setbox \@tempboxa \hbox {\normalfont \footnotesize {
+#1.}~~ #2}\ifdim \wd \@tempboxa >\hsize \setbox \@tempboxa \hbox {\normalfont \
+footnotesize {#1.}~~ }\parbox [t]{\hsize }{\normalfont \footnotesize \noindent 
+\unhbox \@tempboxa #2}\else \ifCLASSOPTIONconference \hbox to\hsize {\normalfon
+t \footnotesize \hfil \box \@tempboxa \hfil }\else \hbox to\hsize {\normalfont 
+\footnotesize \box \@tempboxa \hfil }\fi \fi \fi  on input line 1139.
+)
+
+Package caption Warning: Unknown document class (or package),
+(caption)                standard defaults will be used.
+See the caption package documentation for explanation.
+
+\c@caption@flags=\count199
+\c@continuedfloat=\count266
+Package caption Info: hyperref package is loaded.
+) (/usr/share/texlive/texmf-dist/tex/latex/caption/subcaption.sty
+Package: subcaption 2020/10/07 v1.3j Sub-captions (AR)
+\c@subfigure=\count267
+\c@subtable=\count268
+)
+(/usr/share/texlive/texmf-dist/tex/latex/xcolor/xcolor.sty
+Package: xcolor 2016/05/11 v2.12 LaTeX color extensions (UK)
+
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/color.cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
+)
+Package xcolor Info: Driver file: pdftex.def on input line 225.
+Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1348.
+Package xcolor Info: Model `hsb' substituted by `rgb' on input line 1352.
+Package xcolor Info: Model `RGB' extended on input line 1364.
+Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1366.
+Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1367.
+Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1368.
+Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1369.
+Package xcolor Info: Model `Gray' substituted by `gray' on input line 1370.
+Package xcolor Info: Model `wave' substituted by `hsb' on input line 1371.
+)
 (/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
 File: l3backend-pdftex.def 2020-01-29 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count199
+\l__color_backend_stack_int=\count269
 \l__pdf_internal_box=\box48
 )
 (./report.aux)
 \openout1 = `report.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 7.
-LaTeX Font Info:    ... okay on input line 7.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 7.
-LaTeX Font Info:    ... okay on input line 7.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 7.
-LaTeX Font Info:    ... okay on input line 7.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 7.
-LaTeX Font Info:    ... okay on input line 7.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 7.
-LaTeX Font Info:    ... okay on input line 7.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 7.
-LaTeX Font Info:    ... okay on input line 7.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 7.
-LaTeX Font Info:    ... okay on input line 7.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 7.
-LaTeX Font Info:    ... okay on input line 7.
-Package hyperref Info: Link coloring OFF on input line 7.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 10.
+LaTeX Font Info:    ... okay on input line 10.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 10.
+LaTeX Font Info:    ... okay on input line 10.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 10.
+LaTeX Font Info:    ... okay on input line 10.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 10.
+LaTeX Font Info:    ... okay on input line 10.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 10.
+LaTeX Font Info:    ... okay on input line 10.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 10.
+LaTeX Font Info:    ... okay on input line 10.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 10.
+LaTeX Font Info:    ... okay on input line 10.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 10.
+LaTeX Font Info:    ... okay on input line 10.
+Package hyperref Info: Link coloring OFF on input line 10.
  (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2019/09/16 v2.46 Cross-referencing by name of section
 
@@ -273,11 +327,11 @@ Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
 (/usr/share/texlive/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty
 Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 )
-\c@section@level=\count266
+\c@section@level=\count270
 )
-LaTeX Info: Redefining \ref on input line 7.
-LaTeX Info: Redefining \pageref on input line 7.
-LaTeX Info: Redefining \nameref on input line 7.
+LaTeX Info: Redefining \ref on input line 10.
+LaTeX Info: Redefining \pageref on input line 10.
+LaTeX Info: Redefining \nameref on input line 10.
 
 (./report.out) (./report.out)
 \@outlinefile=\write3
@@ -286,16 +340,16 @@ LaTeX Info: Redefining \nameref on input line 7.
 
 (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count267
-\scratchdimen=\dimen159
+\scratchcounter=\count271
+\scratchdimen=\dimen166
 \scratchbox=\box49
-\nofMPsegments=\count268
-\nofMParguments=\count269
+\nofMPsegments=\count272
+\nofMParguments=\count273
 \everyMPshowfont=\toks17
-\MPscratchCnt=\count270
-\MPscratchDim=\dimen160
-\MPnumerator=\count271
-\makeMPintoPDFobject=\count272
+\MPscratchCnt=\count274
+\MPscratchDim=\dimen167
+\MPnumerator=\count275
+\makeMPintoPDFobject=\count276
 \everyMPtoPDFconversion=\toks18
 ) (/usr/share/texlive/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
@@ -306,78 +360,51 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
+Package caption Info: Begin \AtBeginDocument code.
+Package caption Info: End \AtBeginDocument code.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 43.
+(Font)              <7> on input line 49.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 43.
+(Font)              <5> on input line 49.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 51.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 51.
+<labels_training.png, id=54, 403.5075pt x 248.93pt>
+File: labels_training.png Graphic file (type png)
+<use labels_training.png>
+Package pdftex.def Info: labels_training.png  used on input line 58.
+(pdftex.def)             Requested size: 108.94847pt x 67.21199pt.
+<feature_15_jet0.png, id=56, 385.44pt x 264.99pt>
+File: feature_15_jet0.png Graphic file (type png)
+<use feature_15_jet0.png>
+Package pdftex.def Info: feature_15_jet0.png  used on input line 62.
+(pdftex.def)             Requested size: 104.07019pt x 71.54825pt.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <9> on input line 62.
 
-
-LaTeX Warning: Citation `editor10' on page 1 undefined on input line 57.
-
-
-LaTeX Warning: Citation `jones08' on page 1 undefined on input line 57.
-
-
-LaTeX Warning: Citation `anderson04' on page 1 undefined on input line 57.
-
-
-LaTeX Warning: Citation `jones08' on page 1 undefined on input line 71.
-
-<denoised_signal_1d.png, id=91, 578.16pt x 433.62pt>
-File: denoised_signal_1d.png Graphic file (type png)
-<use denoised_signal_1d.png>
-Package pdftex.def Info: denoised_signal_1d.png  used on input line 83.
-(pdftex.def)             Requested size: 243.91125pt x 182.93298pt.
-<local_wdenoised_1d.png, id=93, 578.16pt x 433.62pt>
-File: local_wdenoised_1d.png Graphic file (type png)
-<use local_wdenoised_1d.png>
-Package pdftex.def Info: local_wdenoised_1d.png  used on input line 90.
-(pdftex.def)             Requested size: 243.91125pt x 182.93298pt.
 [1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}
 
 
-]
+ <./labels_training.png> <./feature_15_jet0.png>]
 
-LaTeX Warning: Citation `anderson04' on page 2 undefined on input line 120.
-
-
-LaTeX Warning: Citation `wavelab' on page 2 undefined on input line 120.
+LaTeX Warning: Reference `fig:cross' on page 2 undefined on input line 93.
 
 
-LaTeX Warning: Citation `kallet04methods' on page 2 undefined on input line 128
-.
+Underfull \hbox (badness 10000) in paragraph at lines 93--101
 
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 158.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 158.
-
-LaTeX Warning: Citation `hunt99pragmatic' on page 2 undefined on input line 178
-.
-
-
-LaTeX Warning: Citation `spolsky04software' on page 2 undefined on input line 1
-79.
-
-
-LaTeX Warning: Citation `schwab00' on page 2 undefined on input line 182.
-
-LaTeX Font Info:    Trying to load font information for OT1+pcr on input line 1
-85.
-(/usr/share/texlive/texmf-dist/tex/latex/psnfss/ot1pcr.fd
-File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
-) [2 <./denoised_signal_1d.png> <./local_wdenoised_1d.png>]
-Underfull \hbox (badness 4479) in paragraph at lines 196--198
-[]\OT1/ptm/m/n/10 Use mean-ing-ful file-names, and not \OT1/pcr/m/n/10 temp1.py
-\OT1/ptm/m/n/10 ,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 241--242
-\OT1/ptm/m/n/10 This should give you a PDF doc-u-ment
+Underfull \hbox (badness 10000) in paragraph at lines 103--104
+
  []
 
-(./report.bbl)
+
+Overfull \hbox (25.10707pt too wide) in paragraph at lines 108--127
+ [] 
+ []
+
 
 ** Conference Paper **
 Before submitting the final camera ready copy, remember to:
@@ -389,33 +416,34 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[3] (./report.aux)
+[2] (./report.aux)
 
 LaTeX Warning: There were undefined references.
 
 Package rerunfilecheck Info: File `report.out' has not changed.
-(rerunfilecheck)             Checksum: C0B39F506CD36F595D3B8C0E85A17769;1341.
+(rerunfilecheck)             Checksum: 79B4C0A6CB2DA21504C5517D0D386D46;672.
  ) 
 Here is how much of TeX's memory you used:
- 5964 strings out of 481241
- 95659 string characters out of 5915412
- 402399 words of memory out of 5000000
- 22779 multiletter control sequences out of 15000+600000
- 443449 words of font info for 92 fonts, out of 8000000 for 9000
+ 7616 strings out of 481241
+ 124450 string characters out of 5915412
+ 436038 words of memory out of 5000000
+ 24443 multiletter control sequences out of 15000+600000
+ 444336 words of font info for 93 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 71i,8n,74p,537b,406s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 71i,9n,74p,572b,480s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texliv
 e/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texm
-f-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/
-fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texlive/texmf-dist/fonts/t
-ype1/urw/courier/ucrr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/time
+f-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/share/texlive/texmf-dist/
+fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/t
+ype1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/p
+ublic/amsfonts/cm/cmsy7.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/time
 s/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb><
 /usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texl
 ive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on report.pdf (3 pages, 223381 bytes).
+Output written on report.pdf (2 pages, 118562 bytes).
 PDF statistics:
- 182 PDF objects out of 1000 (max. 8388607)
- 163 compressed objects within 2 object streams
- 40 named destinations out of 1000 (max. 500000)
- 179 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 117 PDF objects out of 1000 (max. 8388607)
+ 99 compressed objects within 1 object stream
+ 16 named destinations out of 1000 (max. 500000)
+ 99 words of extra memory for PDF output out of 10000 (max. 10000000)
 
