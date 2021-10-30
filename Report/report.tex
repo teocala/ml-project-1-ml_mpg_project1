@@ -2,6 +2,9 @@
 
 \usepackage{hyperref}
 \usepackage{graphicx}	% For figure environment
+\usepackage{caption}
+\usepackage{subcaption} % For captions in subfigures
+\usepackage{xcolor} % For coloured text
 
 
 \begin{document}
@@ -9,7 +12,7 @@
 
 \author{
   Matteo Calafà, Giulia Mescolini, Paolo Motta\\
-  \textit{First Project for the course "Machine Learning" at EPFL Lausanne, Switzerland}
+  \textit{First Project for the course ``Machine Learning" at EPFL Lausanne, Switzerland}
 }
 
 \maketitle
@@ -27,11 +30,12 @@ In section~\ref{preprocessing}, we present the analysis of the database and the 
 \label{preprocessing}
 
 \subsection{First Analysis of the Dataset}
-The dataset contains 250000 points for training and 568238 for testing, with 30 features and their corresponding binary labels ("-1" for "background" and "1" for "signal"), which clearly have to be predicted in the case of the test set. \\
+\label{categorical}
+The dataset contains 250000 points for training and 568238 for testing, with 30 features and their corresponding binary labels (``-1" for ``background" and ``1" for ``signal"), which clearly have to be predicted in the case of the test set. \\
 First of all, we noticed that one feature, \emph{PRI\_jet\_num}, is the only one to be categorical; it represents the number of jets (showers of hadrons originating from a quark and a gluon, clustered together after being produced in a particle collision) and it ranges from 0 to 3. Inspired by the challenge documentation, we noticed that some features are meaningless for some numbers of jets, therefore we split the dataset into 4 subclasses, each one characterized by a different \emph{PRI\_jet\_num}.
 
 \subsection{Management of Missing Values}
-From the documentation, we know that each "-999" present in the dataset represents a missing value; if for a feature more than the 70 \% of data is missing, we decide not to consider it, while the remaining missing values are substituted by the median of the feature, which is, according to theory, a robust estimator.
+From the documentation, we know that each ``-999" present in the dataset represents a missing value; if for a feature more than the 70 \% of data is missing, we decide not to consider it, while the remaining missing values are substituted by the median of the feature, which is, according to theory, a robust estimator.
 
 \subsection{Standardization}
 In order to ensure a good functioning of the numeric optimization, it is a good practice to standardize the dataset: we subtract from each feature its mean and divide by its standard deviation.
@@ -39,246 +43,96 @@ This helps the feature matrix in having a better condition number.
 
 \subsection{Feature Engineering}
 We plot the features and ideate strategies to deal with their peculiarities.
+Two relevant examples of empirical distribution plots are shown in Figure \ref{fig:empdistr}.
+
 \begin{itemize}
-    \item \textbf{Logaritmic transform:}
-    \item \textbf{Useless features:}
-    \item \textbf{Angles:}
+    \item \textbf{Logaritmic transform:} for positive features, we compute a transformation into $log(1+x)$, which helps in reducing or removing the skewness of our original data. Since the distribution of some of our continuous features is non-normal, we apply this strategy to make the data as ``normal" as possible. 
+    \item \textbf{Useless features:} from the observation of the plots (e.g. Figure \ref{fig1}), we notice that the empirical distribution of some features does not change with the label, therefore we simplify our model by not considering them.
+    \item \textbf{Angles:} the features in columns 15,18,20,24,27\footnote{Note that the columns after the 22th have their ID decreased by one, since the \emph{PRI\_jet\_num} column has been deleted} represent angles, so we applied the transformation into $cos(x)$.
 \end{itemize}
 
+\begin{figure}[h]
+    \centering
+     \subfloat[Labels by \emph{PRI\_jet\_num} \label{fig1}]{
+        \includegraphics[scale=0.27]{labels_training.png}
+    }
+    \quad
+    \subfloat[15th feature for 1$^{st}$ group \label{fig2}]{
+        \includegraphics[scale=0.27]{feature_15_jet0.png}
+    }
+    \caption{Exploratory plots on the training dataset}
+    \label{fig:empdistr}
+\end{figure}
+
 \subsection{Polynomial Feature Expansion}
+This technique improves the representation power of linear models. For each feature, we add in the matrix its square, its square root and cubic root.
+Moreover, we include all the pairwise products as new features.\\
+\textcolor{red}{SCRIVERE SE LO RISOLVIAMO:} The optimal degree 2 of the polynomial expansion is found performing 4-fold cross-validation.
 
 \subsection{Management of Outliers}
 To deal with the presence of outliers, we fix $\alpha = 0.1$ and decide to cap the extreme values of each feature to the $\alpha$-quantile (for the lower tail) and to the 1-$alpha$-quantile (for the upper tail).
 
 \section{Models and Methods}
 \label{models}
+After the pre-processing on the dataset, we implement several models to solve the classification task, which employ linear models and logistic regression.
+Note that, as stated in \ref{categorical}, we use only the train data with a specific \emph{PRI\_jet\_num} to predict the label of test data belonging to the same group. \\
+The methods considered are:
+\begin{itemize}
+    \item \textbf{Gradient Descent}
+    \item \textbf{Stochastic Gradient Descent}, 
+    \item \textbf{Least Squares} with Normal Equations
+    \item \textbf{Logistic Regression}
+    \end{itemize}
+We implement the regularized versions as well, in order to reduce overfitting:
+\begin{itemize}
+\item \textbf{Lasso Regression}
+\item \textbf{Ridge Regression}
+\item \textbf{Regularized Logistic Regression}
+\end{itemize}
 
-The ideas for good writing have come
-from~\cite{editor10,jones08,anderson04}.
-
-\subsection{Getting Help}
-One should try to get a draft read by as many friendly people as
-possible. And remember to treat your test readers with respect. If
-they are unable to understand something in your paper, then it is
-highly likely that your reviewers will not understand it
-either. Therefore, do not be defensive about the criticisms you get,
-but use it as an opportunity to improve the paper. Before your submit
-your friends to the pain of reading your draft, please \emph{use a
-  spell checker}.
-
-\subsection{Abstract}
-The abstract should really be written last, along with the title of
-the paper. The four points that should be covered~\cite{jones08}:
-\begin{enumerate}
-\item State the problem.
-\item Say why it is an interesting problem.
-\item Say what your solution achieves.
-\item Say what follows from your solution.
-\end{enumerate}
-
-\subsection{Figures and Tables}
-
-\begin{figure}[tbp]
-  \centering
-  \includegraphics[width=\columnwidth]{denoised_signal_1d}
-  \caption{Signal compression and denoising using the Fourier basis.}
-  \vspace{-3mm}
-  \label{fig:denoise-fourier}
-\end{figure}
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=\columnwidth]{local_wdenoised_1d}
-  \vspace{-3mm}
-  \caption{Signal compression and denoising using the Daubechies wavelet basis.}
-  \label{fig:denoise-wavelet}
-\end{figure}
-
-Use examples and illustrations to clarify ideas and results. For
-example, by comparing Figure~\ref{fig:denoise-fourier} and
-Figure~\ref{fig:denoise-wavelet}, we can see the two different
-situations where Fourier and wavelet basis perform well. 
-
-\subsection{Models and Methods}
-The models and methods
-section should describe what was
-done to answer the research question, describe how it was done,
-justify the experimental design, and
-explain how the results were analyzed.
-
-The model refers to the underlying mathematical model or structure which 
-you use to describe your problem, or that your solution is based on. 
-The methods on the other hand, are the algorithms used to solve the problem. 
-In some cases, the suggested method directly solves the problem, without having it 
-stated in terms of an underlying model. Generally though it is a better practice to have 
-the model figured out and stated clearly, rather than presenting a method without specifying 
-the model. In this case, the method can be more easily evaluated in the task of fitting 
-the given data to the underlying model.
-
-The methods part of this section, is not a step-by-step, directive,
-protocol as you might see in your lab manual, but detailed enough such
-that an interested reader can reproduce your
-work~\cite{anderson04,wavelab}.
-
-The methods section of a research paper provides the information by
-which a study's validity is judged.
-Therefore, it requires a clear and precise description of how an
-experiment was done, and the rationale
-for why specific experimental procedures were chosen.
-It is usually helpful to
-structure the methods section by~\cite{kallet04methods}:
-\begin{enumerate}
-\item Layout the model you used to describe the problem or the solution.
-\item Describing the algorithms used in the study, briefly including
-  details such as hyperparameter values (e.g. thresholds), and
-  preprocessing steps (e.g. normalizing the data to have mean value of
-  zero).
-\item Explaining how the materials were prepared, for example the
-  images used and their resolution.
-\item Describing the research protocol, for example which examples
-  were used for estimating the parameters (training) and which were
-  used for computing performance.
-\item Explaining how measurements were made and what
-  calculations were performed. Do not reproduce the full source code in
-  the paper, but explain the key steps.
-\end{enumerate}
-
-\subsection{Results}
-
-Organize the results section based on the sequence of table and
-figures you include. Prepare the tables and figures as soon as all
-the data are analyzed and arrange them in the sequence that best
-presents your findings in a logical way. A good strategy is to note,
-on a draft of each table or figure, the one or two key results you
-want to address in the text portion of the results.
-The information from the figures is
-summarized in Table~\ref{tab:fourier-wavelet}.
-
-\begin{table*}[htbp]
-  \centering
-  \begin{tabular}[c]{|l||l|l|l|}
-    \hline
-    Basis&Support&Suitable signals&Unsuitable signals\\
-    \hline
-    Fourier&global&sine like&localized\\
-    wavelet&local&localized&sine like\\
-    \hline
-  \end{tabular}
-  \caption{Characteristics of Fourier and wavelet basis.}
-  \label{tab:fourier-wavelet}
-\end{table*}
-
-When reporting computational or measurement results, always
-report the mean (average value) along with a measure of variability
-(standard deviation(s) or standard error of the mean).
-
-
+The optimal hyper-parameter $\lambda$ is chosen with a 4-fold cross-validation. In Figure~\ref{fig:cross}, we report the accuracy trends for training and test set, which lead to our choice of hyper-parameters. \textcolor{red}{SCRIVERE MEGLIO QUANDO LO AVREMO}.
+\\
+\newline
+\textcolor{red}{INSERIRE IMMAGINI DELLA CROSS-VALIDATION DI LAMBDA E DEGREE}
+\\
+\textcolor{red}{METODO FISTA}
+\\
+We implement also the K-nearest classification algorithm, which provides an accuracy of \textcolor{red}{INSERIRE}; this result is worse than the ones presented in Table~\ref{table1}, and the reason of this lies in the fact that the dimension of our dataset is extremely high, so the notion of distance does not make sense and the performance results also very computationally demanding.
 \section{Results}
 \label{results}
+We report the accuracy results obtained for each method, with the optimal choice of hyper-parameters: \\
 
-There is a lot of literature (for example~\cite{hunt99pragmatic} and
-\cite{spolsky04software}) on how to write software. It is not the
-intention of this section to replace software engineering
-courses. However, in the interests of reproducible
-research~\cite{schwab00}, there are a few guidelines to make your
-reader happy:
-\begin{itemize}
-\item Have a \texttt{README} file that (at least) describes what your
-  software does, and which commands to run to obtain results. Also
-  mention anything special that needs to be set up, such as
-  toolboxes\footnote{For those who are
-  particularly interested, other common structures can be found at
-  \url{http://en.wikipedia.org/wiki/README} and
-  \url{http://www.gnu.org/software/womb/gnits/}.}.
-\item A list of authors and contributors can be included in a file
-  called \texttt{AUTHORS}, acknowledging any help that you may have
-  obtained. For small projects, this information is often also
-  included in the \texttt{README}.
-\item Use meaningful filenames, and not \texttt{temp1.py},
-  \texttt{temp2.py}. 
-\item Document your code. Each file should at least have a short
-  description about its reason for existence. Non obvious steps in the
-  code should be commented. Functions arguments and return values should be described.
-\item Describe how the results presented in your paper can be reproduced.
-\end{itemize}
-
-
-\subsection{\LaTeX{} Primer}
-\label{sec:latex-primer}
-
-\LaTeX{} is one of the most commonly used document preparation systems
-for scientific journals and conferences. It is based on the idea
-that authors should be able to focus on the content of what they are
-writing without being distracted by its visual presentation.
-The source of this file can be used as a starting point for how to use
-the different commands in \LaTeX{}. We are using an IEEE style for
-this course.
-
-\subsubsection{Installation}
-
-There are various different packages available for processing \LaTeX{}
-documents.
-On OSX use Mac\TeX{}
-(\url{http://www.tug.org/mactex/}). On Windows, use for example Mik\TeX{} (\url{http://miktex.org/}).
-
-\subsubsection{Compiling \LaTeX{}}
-Your directory should contain at least~4 files, in addition to image
-files. Images should be in \texttt{.png}, \texttt{.jpg} or
-\texttt{.pdf} format.
-\begin{itemize}
-\item IEEEtran.cls
-\item IEEEtran.bst
-\item groupXX-submission.tex
-\item groupXX-literature.bib
-\end{itemize}
-Note that you should replace groupXX with your chosen group name.
-Then, from the command line, type:
-\begin{verbatim}
-$ pdflatex groupXX-submission
-$ bibtex groupXX-literature
-$ pdflatex groupXX-submission
-$ pdflatex groupXX-submission
-\end{verbatim}
-This should give you a PDF document \texttt{groupXX-submission.pdf}.
-
-\subsubsection{Equations}
-
-There are three types of equations available: inline equations, for
-example $y=mx + c$, which appear in the text, unnumbered equations
-$$y=mx + c,$$
-which are presented on a line on its own, and numbered equations
-\begin{equation}
-  \label{eq:linear}
-  y = mx + c
-\end{equation}
-which you can refer to at a later point (Equation~(\ref{eq:linear})).
-
-\subsubsection{Tables and Figures}
-
-Tables and figures are ``floating'' objects, which means that the text
-can flow around it.
-Note
-that \texttt{figure*} and \texttt{table*} cause the corresponding
-figure or table to span both columns.
+\textcolor{red}{INSERIRE I DATI GIUSTI}
+\begin{center}
+\label{table1}
+\begin{tabular}{|c c c|} 
+ \hline
+ Method & Train Accuracy & Test Accuracy  \\ [0.5ex] 
+ \hline\hline
+ Least Squares GD & 6 & 87837  \\ 
+ \hline
+ Least Squares SGD & 7 & 78 \\
+ \hline
+ Least Squares Normal Eqs. & 545 & 778  \\
+ \hline
+ Lasso Regression & 545 & 18744  \\
+ \hline
+ Ridge Regression & 88 & 788  \\ 
+ \hline
+ Logistic Regression & 545 & 18744  \\
+ \hline
+ Reg. Logistic Regression & 545 & 18744  \\
+ \hline
+\end{tabular}
+\end{center}
 
 
 
 \section{Conclusion}
 
-The aim of a scientific paper is to convey the idea or discovery of
-the researcher to the minds of the readers. The associated software
-package provides the relevant details, which are often only briefly
-explained in the paper, such that the research can be reproduced.
-To write good papers, identify your key idea, make your contributions
-explicit, and use examples and illustrations to describe the problems
-and solutions.
+The best performance, with an accuracy on the test set of \textcolor{red}{INSERIRE NUMERO E POSIZIONE IN CLASSIFICA SE ALTA}, is obtained with the Lasso Regression; this highlights how even standard models can be powerful in solving complex classification tasks, and how regularization can help to reduce overfitting.
+In addiction, we want to remark that a relevant part of the success of the task is up to the data preprocessing and interpretation.
 
-\section*{Acknowledgements}
-The author thanks Christian Sigg for his careful reading and helpful
-suggestions.
-
-\bibliographystyle{IEEEtran}
-\bibliography{literature}
 
 \end{document}
-
 
