@@ -5,7 +5,7 @@ from proj1_helpers import *
 
 def missing_values_elimination(X):
     """
-    Deletion of features with more than 70% missing values and imposition of the mean in the remaining features
+    Deletion of features with more than 70% missing values and imposition of the median in the remaining features
     """
     N, D = X.shape
     missing_data = np.zeros(D)
@@ -25,33 +25,9 @@ def missing_values_elimination(X):
 
     return X
 
-def missing_values_correction(X):
-    """
-    Correction of the missing terms (=-999) with the imposition of the mean value
-    """
-    N, D = X.shape
-    missing_data = np.zeros(D)
-    for i in range(D):
-        missing_data[i] = np.count_nonzero(X[:,i]==-999)
-        if missing_data[i]>0:
-            X_feature = X[:,i]
-            median = np.median(X_feature[X_feature != -999])
-            X[:,i] = np.where(X[:,i]==-999, median, X[:,i])
-    return X
-
-
-def missing_values_correction_Giulia(X,cols_to_delete):
-    """
-    Elimination of columns with missing terms
-    """
-    X = np.delete(X, cols_to_delete, axis = 1)
-
-    return X
-
-
 def normalize(X):
     """
-    Normalization of the features values by division by the maximum value for each feature
+    Normalization of the features values by division by the maximum value for each feature (not used in the final version)
     """
     D = X.shape[1]
     for i in range(D):
@@ -61,7 +37,7 @@ def normalize(X):
 
 def standardize(x, mean=None, std=None):
     """
-    Standardization of a vector: mean is subtracted, then division by the standard deviation
+    Standardization: mean is subtracted, then division by the standard deviation
     """
     if mean is None:
         mean = np.mean(x, axis=0)
@@ -72,20 +48,9 @@ def standardize(x, mean=None, std=None):
 
     return x
 
-def standardize_tX(X):
-    """
-    Standardization of the whole training dataset
-    """
-    # N = X.shape[0]
-    # D = X.shape[1]
-    # for i in range(D):
-    #     X[:,i] = np.reshape(standardize(X[:,i]),(N,))
-
-    return standardize(X)
-
 def eliminate_outliers(X, a):
     """
-    Given the quantile of order a, the upper and lower tail of the data are cut, by imposing the value of the 1-a and a quantile,   respcetively
+    Given the quantile of order a, the upper and lower tail of the data are cut, by imposing the value of the 1-a and a quantile, respcetively
     """
     D = X.shape[1]
     for i in range(D):
@@ -96,7 +61,9 @@ def eliminate_outliers(X, a):
 
 
 def build_k_indices(y, k_fold, seed):
-    """build k indices for k-fold."""
+    """
+    Build k indices for k-fold
+    """
     num_row = y.shape[0]
     interval = int(num_row / k_fold)
     np.random.seed(seed)
@@ -105,8 +72,11 @@ def build_k_indices(y, k_fold, seed):
                  for k in range(k_fold)]
     return np.array(k_indices)
 
-def cross_validation(y, x, k_indices, k, lambda_):
-    """return the loss of ridge regression."""
+
+def cross_validation_ridge_lambda(y, x, k_indices, k, lambda_):
+    """
+    Utility for the cross validation on lambda, for Ridge Regression
+    """
     # get k'th subgroup in test, others in train:
     ind = k_indices[k,:]
     x_te = x[ind]
@@ -122,8 +92,10 @@ def cross_validation(y, x, k_indices, k, lambda_):
 
     return w, loss_tr, loss_te
 
-def cross_validation_degree(y, x, k_indices, k, lambda_, degree):
-    """return the loss of ridge regression."""
+def cross_validation_ridge_degree(y, x, k_indices, k, lambda_, degree):
+    """
+    Utility for the cross validation on degree, for Ridge Regression
+    """
     # get k'th subgroup in test, others in train:
     ind = k_indices[k,:]
     x_te = x[ind]
@@ -141,8 +113,10 @@ def cross_validation_degree(y, x, k_indices, k, lambda_, degree):
 
     return w, loss_tr, loss_te
 
-def cross_validation_logistic(y, x, k_indices, k, lambda_, initial_w, max_iters, gamma):
-    """return the loss of ridge regression."""
+def cross_validation_logistic_lambda(y, x, k_indices, k, lambda_, initial_w, max_iters, gamma):
+    """
+    Utility for the cross validation on lambda, for Logistic Regression
+    """
     # get k'th subgroup in test, others in train:
     ind = k_indices[k,:]
     x_te = x[ind]
@@ -162,7 +136,9 @@ def cross_validation_logistic(y, x, k_indices, k, lambda_, initial_w, max_iters,
     return w, loss_tr, loss_te, accuracy
 
 def cross_validation_logistic_degree(y, x, k_indices, deg, k, max_iters, gamma):
-    """return the loss of ridge regression."""
+    """
+    Utility for the cross validation on degree, for Logistic Regression
+    """
     # get k'th subgroup in test, others in train:
     ind = k_indices[k,:]
     x_te = x[ind]
@@ -173,7 +149,7 @@ def cross_validation_logistic_degree(y, x, k_indices, deg, k, max_iters, gamma):
     y_tr = y[ind_tr]
     x_tr = build_poly(x_tr,deg)
     x_te = build_poly(x_te,deg)
-    # ridge regression:
+    # logistic regression:
     initial_w = np.zeros(x_tr.shape[1])
     loss_tr, w = logistic_regression(y_tr, x_tr, initial_w, max_iters, gamma)
     # calculate the loss for test data:
@@ -181,26 +157,43 @@ def cross_validation_logistic_degree(y, x, k_indices, deg, k, max_iters, gamma):
     loss_te = compute_loss_logistic(y_te, x_te, w)
     return w, loss_tr, loss_te
 
-def plot_train_test(train_errors, test_errors, accuracies, lambdas):
+def plot_train_test_logistic(train_errors, test_errors, accuracies, lambdas):
     """
     train_errors, test_errors and lambas should be list (of the same size) the respective train error and test error for a given lambda,
     * lambda[0] = 1
     * train_errors[0] = RMSE of a logistic regression on the train set
     * test_errors[0] = RMSE of the parameter found by logistic regression applied on the test set
-
-    degree is just used for the title of the plot.
     """
     plt.semilogx(lambdas, train_errors, color='b', marker='*', label="Train error")
     plt.semilogx(lambdas, test_errors, color='r', marker='*', label="Test error")
     plt.semilogx(lambdas, accuracies, color='g', marker='*', label="Accuracies")
-    plt.xlabel("lambda")
+    plt.xlabel("hyper-parameter")
     plt.ylabel("RMSE")
     plt.title("Regularized Logistic Regression")
     leg = plt.legend(loc=1, shadow=True)
     leg.draw_frame(False)
-    plt.savefig("reg_logistic_regression")
+    
+def plot_train_test_ridge(train_errors, test_errors, accuracies, lambdas):
+    """
+    train_errors, test_errors and lambas should be list (of the same size) the respective train error and test error for a given lambda,
+    * lambda[0] = 1
+    * train_errors[0] = RMSE of a logistic regression on the train set
+    * test_errors[0] = RMSE of the parameter found by logistic regression applied on the test set
+    """
+    
+    plt.semilogx(lambdas, train_errors, color='b', marker='*', label="Train error")
+    plt.semilogx(lambdas, test_errors, color='r', marker='*', label="Test error")
+    plt.semilogx(lambdas, accuracies, color='g', marker='*', label="Accuracies")
+    plt.xlabel("hyper-parameter")
+    plt.ylabel("RMSE")
+    plt.title("Ridge Regression")
+    leg = plt.legend(loc=1, shadow=True)
+    leg.draw_frame(False)
 
 def choose_lambda_logistic(y,tX, initial_w, maxiter, gamma):
+    """
+    Returns the optimal lambda obtained with cross-validation for logistic regression
+    """
     seed = 1
     k_fold = 4
     lambdas = np.logspace(-6, 0, 20)
@@ -226,10 +219,13 @@ def choose_lambda_logistic(y,tX, initial_w, maxiter, gamma):
         rmse_te.append(np.sqrt(2 * te_loss/k_fold))
         accuracies.append(accuracy_i/k_fold)
         print ("lambda = ", lambdas[i], ' - accuracy = ', accuracy_i/k_fold)
-    plot_train_test(rmse_tr, rmse_te, accuracies, lambdas)
+    plot_train_test_logistic(rmse_tr, rmse_te, accuracies, lambdas)
     return lambdas[np.argmin(rmse_te)]
 
 def choose_degree_logistic(y,tX, maxiter, gamma):
+    """
+    Returns the optimal degree obtained with cross-validation for logistic regression
+    """
     seed = 1
     k_fold = 4
     degrees = [1,2,3,4,5,6,7]
@@ -251,10 +247,13 @@ def choose_degree_logistic(y,tX, maxiter, gamma):
             te_loss = te_loss + loss_te
         rmse_tr.append(np.sqrt(2 * tr_loss/k_fold))
         rmse_te.append(np.sqrt(2 * te_loss/k_fold))
-    plot_train_test(rmse_tr, rmse_te, degrees)
+    plot_train_test_logistic(rmse_tr, rmse_te, degrees)
     return degrees[np.argmin(rmse_te)]
 
 def choose_lambda_ridge(y,tX, initial_w, maxiter, gamma):
+    """
+    Returns the optimal lambda obtained with cross-validation for ridge regression
+    """
     seed = 1
     k_fold = 4
     lambdas = np.logspace(-6, 0, 20)
@@ -275,10 +274,13 @@ def choose_lambda_ridge(y,tX, initial_w, maxiter, gamma):
             te_loss = te_loss + loss_te
         rmse_tr.append(np.sqrt(2 * tr_loss/k_fold))
         rmse_te.append(np.sqrt(2 * te_loss/k_fold))
-    plot_train_test(rmse_tr, rmse_te, lambdas)
+    plot_train_test_ridge(rmse_tr, rmse_te, lambdas)
     return lambdas[np.argmin(rmse_te)]
 
 def choose_degree_ridge(y,tX, maxiter, gamma):
+    """
+    Returns the optimal degree obtained with cross-validation for ridge regression
+    """
     seed = 1
     k_fold = 4
     degrees = [1,2,3,4,5,6,7]
@@ -302,11 +304,13 @@ def choose_degree_ridge(y,tX, maxiter, gamma):
         rmse_te.append(np.sqrt(2 * te_loss/k_fold))
     print(rmse_te)
     print(rmse_tr)
-    plot_train_test(rmse_tr, rmse_te, degrees)
+    plot_train_test_ridge(rmse_tr, rmse_te, degrees)
     return degrees[np.argmin(rmse_te)]
 
 def build_poly(x, degree):
-    """polynomial basis functions for input data x, for j=0 up to j=degree."""
+    """
+    Polynomial basis functions for input data x, for j=0 up to j=degree
+    """
     N, D = x.shape
     poly_basis = np.zeros(shape = (N, 1+D*(degree)))
 
@@ -319,7 +323,9 @@ def build_poly(x, degree):
     return poly_basis
 
 def root(x,t):
-    """ Compute the th-square of each element of a matrix  """
+    """ 
+    Computes the th-square of each element of a matrix
+    """
     N, D = x.shape
     r = np.zeros([N,D])
     for i in range(N):
@@ -331,7 +337,9 @@ def root(x,t):
     return r
 
 def build_poly_with_roots(x, degree):
-    """polynomial basis functions for input data x, for j=0 up to j=degree, with square and cubic root also."""
+    """
+    Polynomial basis of degree M=degree for input data x, with square roots, cubic roots and pairwise products
+    """
     N, D = x.shape
     temp_dict = {}
     count = 0
@@ -360,43 +368,10 @@ def build_poly_with_roots(x, degree):
 
     return poly_basis
 
-def build_poly2_with_pairs(x):
-    N, D = x.shape
-    temp_dict = {}
-    count = 0
-
-    for i in range(D):
-        for j in range(i+1,D):
-            temp = x[:,i]*x[:,j]
-            temp_dict[count] = [temp]
-            count = count + 1
-
-    poly_basis = np.zeros(shape = (N, 1+2*D+count))
-
-    poly_basis[:,0] = np.ones(N)
-
-
-    for n in range(D):
-        poly_basis[:, 1+n ] = np.power(x[:,n],1)
-        poly_basis[:, 1+D+n] = np.power(x[:,n],2)
-
-
-    for m in range(count):
-        poly_basis[:,1+2*D+m] = temp_dict[m][0]
-
-
-    return poly_basis
-
-def phi(x, degree):
-    """
-    Transformation of X matrix with polynomial expansion of given degree
-    """
-    x_poly = build_poly(x, degree)
-
-    return x_poly
-
 def compute_accuracy(y_pred, y):
-    """Computes accuracy"""
+    """
+    Computes accuracy
+    """
     total = 0
     for i, y_val in enumerate(y):
         if y_val == y_pred[i]:
@@ -405,10 +380,15 @@ def compute_accuracy(y_pred, y):
     return total / len(y)
 
 def get_subset_PRI_jet_num(x, num_jet):
-    """ Returns the rows whose PRI_jet_num (feature in col 22) is equal to num_jet """
+    """ 
+    Returns the rows whose PRI_jet_num (feature in col 22) is equal to num_jet
+    """
     return np.where(x[:,22] == num_jet)
 
 def k_nearest(x, y, x_test, k):
+    """
+    Assigns the label y by using the K-nearest algorithm
+    """
     # warnings:
     # 1) x and x_test must be corrected from missing data and standardized (other l^2 norm is unbalanced)
     # 2) k must be odd (otherwise doubt choice when k/2 vs k/2)
@@ -430,32 +410,10 @@ def k_nearest(x, y, x_test, k):
 
     return y_test
 
-def plot_labels_in_training(y,tX):
-    msk_jets_train = {
-        0: tX[:, 22] == 0,
-        1: tX[:, 22] == 1,
-        2: tX[:, 22] == 2,
-        3: tX[:, 22] == 3
-        }
-
-    ax = plt.subplot(111)
-    colors = ['b','g','r','y']
-    legend = ['class: 0','class: 1','class: 2','class: 3']
-    ind = np.array([-1,  1])
-    w = 0.25
-    for idx in range(len(msk_jets_train)):
-        y_idx = y[msk_jets_train[idx]]
-        count_prediction = {-1:  np.count_nonzero(y_idx == -1), 1:  np.count_nonzero(y_idx == 1)}
-        ax.bar(ind+w*idx, count_prediction.values(), width=w, color=colors[idx],align='center')
-
-    ax.set_ylabel('Numbers of training data')
-    ax.set_xticks(ind+0.25)
-    ax.set_xticklabels( ('prediction is -1', 'prediction is 1') )
-    ax.legend(legend)
-    ax.plot()
-
 def log_transform(x):
-    """ Logaritmic transformation for positive features x, substitute x with log(1+x)"""
+    """ 
+    Logaritmic transformation for positive features x, substitute x with log(1+x)
+    """
     # The indexes of positive features are identified by plot analysis
     idx = [0,1,2,5,7,9,10,13,16,19,21,22,25]
     x_t1 = np.log1p(x[:, idx])
@@ -464,7 +422,9 @@ def log_transform(x):
     return x
 
 def symmetric_transform(x):
-    """Absolute value of symmetrical features"""
+    """
+    Absolute value of symmetrical features
+    """
     # The indexes of symmetrical features are identified by plot analysis
     # To avoid, eta parameters are intentionally symmetrical and the absolute value would lose their meaning
     idx = [14,17,23,26]
@@ -473,7 +433,9 @@ def symmetric_transform(x):
     return x
 
 def angle_transform(x):
-    """Tranformation for angles features"""
+    """
+    Tranformation for angles features
+    """
     # Physically, these features are measures of angles. Thus, they need to be transformed before the regression
     idx = [15,18,20,24,27]
     x[:,idx] = np.cos(x[:,idx])
@@ -492,9 +454,12 @@ def PCA (tX):
     print ('PCA eigenvalues = ', eigenvalues)
 
 def preprocessing(x):
+    """
+    Pre-processing of the given tensor x by applying the above implemented techniques
+    """
     x = missing_values_elimination(x)
     x = log_transform(x)
     x = angle_transform(x)
-    x = standardize_tX(x)
+    x = standardize(x)
     x = np.delete(x, [15,16,18,20], 1)
     return x

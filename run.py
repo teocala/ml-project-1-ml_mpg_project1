@@ -40,8 +40,6 @@ if __name__ == '__main__':
     lambda_ = 0.01
     #degree = 2
 
-    """ Exploratory plot """
-    #plot_labels_in_training(y_train,tX_train)
 
     """ Splitting of training and test data according to the categorical feature PRI_jet_num """
 
