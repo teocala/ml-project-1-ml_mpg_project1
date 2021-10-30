@@ -221,7 +221,7 @@ def compute_subgradient_l1_logistic(y, tx, w, lambda_):
     return compute_gradient_logistic(y,tx,w) + lambda_*np.sign(w)
 
 
-def l1_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
+def l1_logistic_regression(y, tx, initial_w, lambda_, max_iters, gamma):
     """
     Regularized Lasso Logistic Gradient Descent algorithm
     INPUTS: y = target, tx = sample matrix, lambda_ = regularization parameter, initial_w = intial guess for the weights vector, max_iters = maximum number of iterations, gamma = learning rate

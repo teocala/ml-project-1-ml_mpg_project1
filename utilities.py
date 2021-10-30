@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from implementations import *
+from proj1_helpers import *
 
 def missing_values_elimination(X):
     """
@@ -150,12 +151,15 @@ def cross_validation_logistic(y, x, k_indices, k, lambda_, initial_w, max_iters,
     ind_tr = np.hstack(ind_tr)
     x_tr = x[ind_tr]
     y_tr = y[ind_tr]
-    # ridge regression:
-    loss_tr, w = reg_logistic_regression(y_tr, x_tr, lambda_, initial_w, max_iters, gamma)
+    # l1 regression with fista
+    loss_tr, w = fista(y_tr, x_tr, initial_w, max_iters, gamma, lambda_)
     # calculate the loss for test data:
     loss_tr = compute_loss_logistic(y_tr, x_tr, w)
     loss_te = compute_loss_logistic(y_te, x_te, w)
-    return w, loss_tr, loss_te
+    y_pred = predict_labels(w, x_te)
+    y_pred[y_pred<0]=0
+    accuracy = compute_accuracy(y_te, y_pred)
+    return w, loss_tr, loss_te, accuracy
 
 def cross_validation_logistic_degree(y, x, k_indices, deg, k, max_iters, gamma):
     """return the loss of ridge regression."""
@@ -177,7 +181,7 @@ def cross_validation_logistic_degree(y, x, k_indices, deg, k, max_iters, gamma):
     loss_te = compute_loss_logistic(y_te, x_te, w)
     return w, loss_tr, loss_te
 
-def plot_train_test(train_errors, test_errors, lambdas):
+def plot_train_test(train_errors, test_errors, accuracies, lambdas):
     """
     train_errors, test_errors and lambas should be list (of the same size) the respective train error and test error for a given lambda,
     * lambda[0] = 1
@@ -188,6 +192,7 @@ def plot_train_test(train_errors, test_errors, lambdas):
     """
     plt.semilogx(lambdas, train_errors, color='b', marker='*', label="Train error")
     plt.semilogx(lambdas, test_errors, color='r', marker='*', label="Test error")
+    plt.semilogx(lambdas, accuracies, color='g', marker='*', label="Accuracies")
     plt.xlabel("lambda")
     plt.ylabel("RMSE")
     plt.title("Regularized Logistic Regression")
@@ -205,20 +210,23 @@ def choose_lambda_logistic(y,tX, initial_w, maxiter, gamma):
 
     rmse_tr = []
     rmse_te = []
+    accuracies = []
 
     for i in range(len(lambdas)):
         lambda_ = lambdas[i]
         tr_loss = 0
         te_loss = 0
+        accuracy_i = 0
         for k in range(k_fold):
-            loss_tr, loss_te = cross_validation_logistic(y, tX, k_indices, k, lambda_, initial_w, maxiter, gamma)[1:]
+            loss_tr, loss_te, accuracy = cross_validation_logistic(y, tX, k_indices, k, lambda_, initial_w, maxiter, gamma)[1:]
             tr_loss = tr_loss + loss_tr
             te_loss = te_loss + loss_te
+            accuracy_i = accuracy_i + accuracy
         rmse_tr.append(np.sqrt(2 * tr_loss/k_fold))
         rmse_te.append(np.sqrt(2 * te_loss/k_fold))
-    print(rmse_te)
-    print(rmse_tr)
-    plot_train_test(rmse_tr, rmse_te, lambdas)
+        accuracies.append(accuracy_i/k_fold)
+        print ("lambda = ", lambdas[i], ' - accuracy = ', accuracy_i/k_fold)
+    plot_train_test(rmse_tr, rmse_te, accuracies, lambdas)
     return lambdas[np.argmin(rmse_te)]
 
 def choose_degree_logistic(y,tX, maxiter, gamma):
@@ -243,8 +251,6 @@ def choose_degree_logistic(y,tX, maxiter, gamma):
             te_loss = te_loss + loss_te
         rmse_tr.append(np.sqrt(2 * tr_loss/k_fold))
         rmse_te.append(np.sqrt(2 * te_loss/k_fold))
-    print(rmse_te)
-    print(rmse_tr)
     plot_train_test(rmse_tr, rmse_te, degrees)
     return degrees[np.argmin(rmse_te)]
 
@@ -269,8 +275,6 @@ def choose_lambda_ridge(y,tX, initial_w, maxiter, gamma):
             te_loss = te_loss + loss_te
         rmse_tr.append(np.sqrt(2 * tr_loss/k_fold))
         rmse_te.append(np.sqrt(2 * te_loss/k_fold))
-    print(rmse_te)
-    print(rmse_tr)
     plot_train_test(rmse_tr, rmse_te, lambdas)
     return lambdas[np.argmin(rmse_te)]
 
@@ -324,7 +328,7 @@ def root(x,t):
                 r[i,j] = x[i,j]**(1/t)
             else:
                 r[i,j] = -(-x[i,j])**(1/t)
-    return r 
+    return r
 
 def build_poly_with_roots(x, degree):
     """polynomial basis functions for input data x, for j=0 up to j=degree, with square and cubic root also."""
@@ -345,13 +349,13 @@ def build_poly_with_roots(x, degree):
     for deg in range(1,degree+1):
         for i in range(D):
             poly_basis[:, 1+D*(deg-1)+i ] = np.power(x[:,i],deg)
-            
+
     for m in range(count):
         poly_basis[:,1+2*D+m] = temp_dict[m][0]
-            
+
     for i in range(D):
         poly_basis[:, 1+D*degree+count + i] = np.abs(x[:,i])**0.5
-    
+
     poly_basis[:,1+D*degree+count+D:] = root(x,3)
 
     return poly_basis
@@ -379,7 +383,7 @@ def build_poly2_with_pairs(x):
 
     for m in range(count):
         poly_basis[:,1+2*D+m] = temp_dict[m][0]
-        
+
 
     return poly_basis
 
@@ -486,7 +490,7 @@ def PCA (tX):
     Z_new = np.dot(Z, eigenvectors)
     fig, ax1 = plt.subplots(1,1)
     print ('PCA eigenvalues = ', eigenvalues)
-    
+
 def preprocessing(x):
     x = missing_values_elimination(x)
     x = log_transform(x)
