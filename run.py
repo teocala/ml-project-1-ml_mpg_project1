@@ -81,65 +81,28 @@ if __name__ == '__main__':
         y [y < 0] = 0
         tX = preprocessing(tX)
         tX = eliminate_outliers(tX, alpha)
-        tX = build_poly(tX,deg)
-
-        """ Analysis of the features distributions for the current jet """
-
-
-        """ Logistic regression on the training set"""
-        # # to choose optimal polynomial degrees: [4,5,7,2]
-        # maxiter = 100
-        # opt_degrees[num_jet] = choose_degree_logistic(y, tX, maxiter, gamma)
-        initial_w = np.zeros(tX.shape[1])
-        #initial_w = least_squares(y,tX)[0]
-        #loss, weights_hat = logistic_regression(y, tX, initial_w, maxiter, gamma)
-        #weights = weights_hat
+        #tX = build_poly(tX,deg)
+        tX = build_poly_with_roots(tX, deg)
 
 
-        """ Logistic regression on the training set with polynomial expansion"""
-        #weights = np.zeros(tX.shape[1] * degree + 1)
-        #initial_w = least_squares(y,tX)[0]
-        # initial_w = np.zeros(tX.shape[1])
-        # loss, weights_hat = logistic_regression(y, tX, initial_w, maxiter, gamma)
+        """ Choice of the logistic regression regularization parameter"""
+        #initial_w = np.zeros(tX.shape[1])
+        #lambda_ = choose_lambda_logistic(y, tX, initial_w, maxiter=100, gamma=0.1)
 
-        # new_cols_kept = [0]
-        # for i in range(0,degree):
-        #     cols_new = np.array(cols_kept) + (i * D + 1)
-        #     cols_new = cols_new.tolist()
-        #     new_cols_kept = new_cols_kept + cols_new
-        # weights[new_cols_kept] = weights_hat
-
-        # """ Logistic regression with SGD on the training set """
-        # weights = np.zeros(D)
-        # initial_w = least_squares(y,tX)[0]
-        # loss, weights_hat = logistic_regression_SGD(y, tX, initial_w, maxiter, gamma)
-        # weights[cols_kept] = weights_hat
 
         """ Regularized logistic regression """
-        # initial_w = least_squares(y,tX)[0]
-        # lambda_ = choose_lambda_logistic(y, tX, initial_w, maxiter, gamma)
-        # maxiter = 5000
-        # weights = np.zeros(D)
-        # initial_w = least_squares(y,tX)[0]
-        loss, weights_hat = l1_logistic_regression(y, tX, lambda_, initial_w, maxiter, gamma)
-        #loss, weights_hat = fista(y, tX, initial_w, maxiter, gamma, lambda_)
-        weights = weights_hat
+        initial_w = np.zeros(tX.shape[1])
+        loss, weights = l1_logistic_regression(y, tX, initial_w, lambda_=0.01, max_iters=2000, gamma=0.1)
+        #loss, weights = fista(y, tX, initial_w, maxiter, gamma, lambda_)
 
-        # """ Ridge Regression """
-        # # to choose optimal polynomial degrees: [4,5,7,2]
-        # # maxiter = 100
-        # # opt_degrees[num_jet] = choose_degree_ridge(y, tX, maxiter, gamma)
-        
-        # weights_hat, loss = ridge_regression(y, tX, lambda_)
-        
-        
 
         """ Correction of the test data """
         tX_jt = preprocessing(tX_jt)
-        tX_jt = build_poly(tX_jt, deg)
+        #tX_jt = build_poly(tX_jt, deg)
+        tX_jt = build_poly_with_roots(tX_jt, deg)
 
         """ Prection for the current jet_num """
-        y_pred[j_test] = predict_labels(weights_hat, tX_jt)
+        y_pred[j_test] = predict_labels(weights, tX_jt)
         #y_pred[j_test] = k_nearest(tX, y, tX_jt, 9)
 
 
