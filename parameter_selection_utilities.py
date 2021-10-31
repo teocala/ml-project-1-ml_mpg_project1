@@ -79,62 +79,6 @@ def cross_validation_ridge(y, x, k_indices, k, degree, lambda_):
 
     return acc_train, acc_test
 
-def choose_parameters_logistic_regression(degrees, lambdas, k_fold, y, tx, seed,gamma):
-    """
-    Returns the hyper-parameters among the ones passed as input which maximize the accuracy predicted with cross validation 
-    """
-    # split data in k fold
-    k_indices = build_k_indices(y, k_fold, seed)
-    comparison = []
-    
-    initial_w = np.zeros(tx.shape[1])
-    maxiter = 2000
-    for degree in degrees:
-        for lamb in lambdas:
-            print('Degree: ',degree)
-            print('Lambda: ',lamb)
-            accs_test = []
-            for k in range(k_fold):
-                acc_test = cross_validation_logistic(y, tx, k_indices, k, degree, lamb, gamma, maxiter, initial_w)[1]
-                accs_test.append(acc_test)
-            comparison.append([degree,lamb,np.mean(accs_test)])
-    
-    comparison = np.array(comparison)
-    ind_best =  np.argmax(comparison[:,2])      
-    best_deg = comparison[ind_best,0]
-    best_l = comparison[ind_best,1]
-    acc = comparison[ind_best,2]
-    
-    #plot_train_test_logistic(comparison[:,2], lambdas, degrees)
-   
-    return best_deg, best_l, acc
-
-def cross_validation_logistic(y, tx, k_indices, k, degree, lamb, gamma, maxiter, initial_w):
-    """return the loss of logistic regression."""
-
-    # get k'th subgroup in test, others in train:
-    ind = k_indices[k,:]
-    ind_tr = np.delete(k_indices, (k), axis = 0)
-    x_te = x[ind]
-    x_tr = np.vstack(x[ind_tr])
-    y_te = y[ind]
-    y_tr = np.hstack(y[ind_tr])
-
-    # form data with polynomial degree:
-    basis_tr = build_poly_with_roots(x_tr, degree)
-    basis_te = build_poly_with_roots(x_te, degree)
-
-    # logistic regression:
-    w = logistic_regression(y_tr, basis_tr, initial_w, maxiter, gamma)[1]
-
-    # calculate the accuracy for train and test data:
-    y_tr_pred = predict_labels(w, basis_tr)
-    y_te_pred = predict_labels(w, basis_te)
-        
-    acc_train = compute_accuracy(y_tr_pred, y_tr)
-    acc_test = compute_accuracy(y_te_pred, y_te)
-
-    return acc_train, acc_test
 
 def choose_parameters_l1_regression(degrees, lambdas, k_fold, y, tx, seed):
     """
@@ -194,28 +138,9 @@ def cross_validation_l1(y, x, k_indices, k, degree, lambda_):
 
     return acc_train, acc_test
 
-def plot_train_test_logistic(train_errors, test_errors, accuracies, lambdas):
-    """
-    train_errors, test_errors and lambas should be list (of the same size) the respective train error and test error for a given lambda,
-    * lambda[0] = 1
-    * train_errors[0] = RMSE of a logistic regression on the train set
-    * test_errors[0] = RMSE of the parameter found by logistic regression applied on the test set
-    """
-    plt.semilogx(lambdas, accuracies, color='g', marker='*', label="Accuracies")
-    plt.xlabel("lambda")
-    plt.ylabel("Accuracy")
-    plt.title("Logistic Regression")
-    leg = plt.legend(loc=8, shadow=True)
-    leg.draw_frame(False)
-    plt.semilogx(degrees, accuracies, color='m', marker='*', label="Accuracies")
-    plt.title("Logistic Regression")
-    plt.xlabel("degree")
-    plt.ylabel("Accuracy")
-    leg = plt.legend(loc=8, shadow=True)
-    leg.draw_frame(False)
 
 
-def plot_train_test_lasso(train_errors, test_errors, accuracies, lambdas):
+def plot_train_test_l1(train_errors, test_errors, accuracies, lambdas):
     """
     train_errors, test_errors and lambas should be list (of the same size) the respective train error and test error for a given lambda,
     * lambda[0] = 1
