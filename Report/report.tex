@@ -90,14 +90,19 @@ We implemented the regularized versions as well in order to reduce overfitting:
 \item \textbf{Regularized Logistic Regression}
 \end{itemize}
 
-The optimal hyper-parameter $\lambda$ is chosen with a 4-fold cross-validation. In Figure~\ref{fig:cross}, we report the accuracy trends for training and test set, which lead to our choice of hyper-parameters. \textcolor{red}{SCRIVERE MEGLIO QUANDO LO AVREMO}.
+The optimal hyper-parameter $\lambda$ is chosen with a 4-fold cross-validation. In Figure ~\ref{reg_lambda}, we report the accuracy trends for training and test set, which lead to our choice of hyper-parameters. \textcolor{red}{SCRIVERE MEGLIO QUANDO LO AVREMO}.
+\\
+\begin{figure}[h] 
+	\centering
+		\includegraphics[scale=0.27]{../reg_logistic_regression.png} 
+	\caption{\emph{RMSE} errors and accuracies obtained through a cross-validation for different values of $\lambda$ ($L^1$ regularizer).}
+	\label{reg_lambda}
+\end{figure}
+\\
+It is noteworthy to notice that a \emph{FISTA} method has been implemented to replace and improve in time the standard \emph{Gradient Descent} when the reduction of the computational cost was essential, for instance in the previous cross-validation study. 
 \\
 \newline
-\textcolor{red}{INSERIRE IMMAGINI DELLA CROSS-VALIDATION DI LAMBDA E DEGREE}
-\\
-\textcolor{red}{METODO FISTA}
-\\
-We implement also the K-nearest classification algorithm, which provides an accuracy of \textcolor{red}{INSERIRE}; this result is worse than the ones presented in Table~\ref{table1}, and the reason of this lies in the fact that the dimension of our dataset is extremely high, so the notion of distance does not make sense and the performance results also very computationally demanding.
+We also implemented the K-nearest classification algorithm, which provides an accuracy of \textcolor{red}{INSERIRE}; nevertheless, this method is not recommended as the ones presented in Table~\ref{table1} because of the high-dimensionality of the problem ($=30$) and the high computational time. It is however true that, without an in-depth preprocessing, it turns out to be more accurate than the logistic regression methods. The reason lies in the fact that, when features are in different forms and are not adapted for a logistic model, a spacial method is more suitable because of its simplicity and its lack of any model assumptions.
 \section{Results}
 \label{results}
 We report the accuracy results obtained for each method, with the optimal choice of hyper-parameters: \\
