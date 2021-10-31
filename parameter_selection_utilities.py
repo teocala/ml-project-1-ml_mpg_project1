@@ -47,6 +47,8 @@ def choose_parameters_ridge_regression(degrees, lambdas, k_fold, y, tx, seed):
     best_deg = comparison[ind_best,0]
     best_l = comparison[ind_best,1]
     acc = comparison[ind_best,2]
+    
+    #plot_train_test_ridge(comparison[:,2], lambdas, degrees)
    
     return best_deg, best_l, acc
 
@@ -77,21 +79,23 @@ def cross_validation_ridge(y, x, k_indices, k, degree, lambda_):
 
     return acc_train, acc_test
 
-def choose_parameters_logistic_regression(degrees, lambdas, k_fold, y, tx, seed):
+def choose_parameters_logistic_regression(degrees, lambdas, k_fold, y, tx, seed,gamma):
     """
     Returns the hyper-parameters among the ones passed as input which maximize the accuracy predicted with cross validation 
     """
     # split data in k fold
     k_indices = build_k_indices(y, k_fold, seed)
     comparison = []
-
+    
+    initial_w = np.zeros(tx.shape[1])
+    maxiter = 2000
     for degree in degrees:
         for lamb in lambdas:
             print('Degree: ',degree)
             print('Lambda: ',lamb)
             accs_test = []
             for k in range(k_fold):
-                acc_test = cross_validation_logistic(y, tx, k_indices, k, degree, lamb)[1]
+                acc_test = cross_validation_logistic(y, tx, k_indices, k, degree, lamb, gamma, maxiter, initial_w)[1]
                 accs_test.append(acc_test)
             comparison.append([degree,lamb,np.mean(accs_test)])
     
@@ -100,10 +104,12 @@ def choose_parameters_logistic_regression(degrees, lambdas, k_fold, y, tx, seed)
     best_deg = comparison[ind_best,0]
     best_l = comparison[ind_best,1]
     acc = comparison[ind_best,2]
+    
+    #plot_train_test_logistic(comparison[:,2], lambdas, degrees)
    
     return best_deg, best_l, acc
 
-def cross_validation_logistic(y, x, k_indices, k, degree, lambda_):
+def cross_validation_logistic(y, tx, k_indices, k, degree, lamb, gamma, maxiter, initial_w):
     """return the loss of logistic regression."""
 
     # get k'th subgroup in test, others in train:
@@ -118,8 +124,8 @@ def cross_validation_logistic(y, x, k_indices, k, degree, lambda_):
     basis_tr = build_poly_with_roots(x_tr, degree)
     basis_te = build_poly_with_roots(x_te, degree)
 
-    # ridge regression:
-    w = logistic_regression(y_tr, basis_tr, lambda_)[0]
+    # logistic regression:
+    w = logistic_regression(y_tr, basis_tr, initial_w, maxiter, gamma)[1]
 
     # calculate the accuracy for train and test data:
     y_tr_pred = predict_labels(w, basis_tr)
@@ -130,7 +136,7 @@ def cross_validation_logistic(y, x, k_indices, k, degree, lambda_):
 
     return acc_train, acc_test
 
-def choose_parameters_lasso_regression(degrees, lambdas, k_fold, y, tx, seed):
+def choose_parameters_l1_regression(degrees, lambdas, k_fold, y, tx, seed):
     """
     Returns the hyper-parameters among the ones passed as input which maximize the accuracy predicted with cross validation 
     """
@@ -144,7 +150,7 @@ def choose_parameters_lasso_regression(degrees, lambdas, k_fold, y, tx, seed):
             print('Lambda: ',lamb)
             accs_test = []
             for k in range(k_fold):
-                acc_test = cross_validation_lasso(y, tx, k_indices, k, degree, lamb)[1]
+                acc_test = cross_validation_l1(y, tx, k_indices, k, degree, lamb)[1]
                 accs_test.append(acc_test)
             comparison.append([degree,lamb,np.mean(accs_test)])
     
@@ -156,8 +162,11 @@ def choose_parameters_lasso_regression(degrees, lambdas, k_fold, y, tx, seed):
    
     return best_deg, best_l, acc
 
-def cross_validation_lasso(y, x, k_indices, k, degree, lambda_):
+def cross_validation_l1(y, x, k_indices, k, degree, lambda_):
     """return the loss of lasso regression."""
+    
+    gamma = 0.01
+    max_iters = 500 
 
     # get k'th subgroup in test, others in train:
     ind = k_indices[k,:]
@@ -171,8 +180,9 @@ def cross_validation_lasso(y, x, k_indices, k, degree, lambda_):
     basis_tr = build_poly_with_roots(x_tr, degree)
     basis_te = build_poly_with_roots(x_te, degree)
 
-    # ridge regression:
-    w = n(y_tr, basis_tr, lambda_)[0]
+    # l1 regularized logistic regression:
+    initial_w = np.zeros(basis_tr.shape[1])
+    w = fista(y_tr, basis_tr, initial_w, max_iters, gamma, lambda_)[1]
 
     # calculate the accuracy for train and test data:
     y_tr_pred = predict_labels(w, basis_tr)
@@ -180,6 +190,7 @@ def cross_validation_lasso(y, x, k_indices, k, degree, lambda_):
         
     acc_train = compute_accuracy(y_tr_pred, y_tr)
     acc_test = compute_accuracy(y_te_pred, y_te)
+    
 
     return acc_train, acc_test
 
@@ -190,16 +201,41 @@ def plot_train_test_logistic(train_errors, test_errors, accuracies, lambdas):
     * train_errors[0] = RMSE of a logistic regression on the train set
     * test_errors[0] = RMSE of the parameter found by logistic regression applied on the test set
     """
-    plt.semilogx(lambdas, train_errors, color='b', marker='*', label="Train error")
-    plt.semilogx(lambdas, test_errors, color='r', marker='*', label="Test error")
     plt.semilogx(lambdas, accuracies, color='g', marker='*', label="Accuracies")
-    plt.xlabel("hyper-parameter")
-    plt.ylabel("RMSE")
-    plt.title("Regularized Logistic Regression")
-    leg = plt.legend(loc=1, shadow=True)
+    plt.xlabel("lambda")
+    plt.ylabel("Accuracy")
+    plt.title("Logistic Regression")
+    leg = plt.legend(loc=8, shadow=True)
+    leg.draw_frame(False)
+    plt.semilogx(degrees, accuracies, color='m', marker='*', label="Accuracies")
+    plt.title("Logistic Regression")
+    plt.xlabel("degree")
+    plt.ylabel("Accuracy")
+    leg = plt.legend(loc=8, shadow=True)
+    leg.draw_frame(False)
+
+
+def plot_train_test_lasso(train_errors, test_errors, accuracies, lambdas):
+    """
+    train_errors, test_errors and lambas should be list (of the same size) the respective train error and test error for a given lambda,
+    * lambda[0] = 1
+    * train_errors[0] = RMSE of a logistic regression on the train set
+    * test_errors[0] = RMSE of the parameter found by logistic regression applied on the test set
+    """
+    plt.semilogx(lambdas, accuracies, color='g', marker='*', label="Accuracies")
+    plt.xlabel("lambda")
+    plt.ylabel("Accuracy")
+    plt.title("L1 - regularized logistic Regression")
+    leg = plt.legend(loc=8, shadow=True)
+    leg.draw_frame(False)
+    plt.semilogx(degrees, accuracies, color='m', marker='*', label="Accuracies")
+    plt.title("L1 - regularized logistic Regression")
+    plt.xlabel("degree")
+    plt.ylabel("Accuracy")
+    leg = plt.legend(loc=8, shadow=True)
     leg.draw_frame(False)
     
-def plot_train_test_ridge(train_errors, test_errors, accuracies, lambdas):
+def plot_train_test_ridge(accuracies, lambdas, degrees):
     """
     train_errors, test_errors and lambas should be list (of the same size) the respective train error and test error for a given lambda,
     * lambda[0] = 1
@@ -207,128 +243,16 @@ def plot_train_test_ridge(train_errors, test_errors, accuracies, lambdas):
     * test_errors[0] = RMSE of the parameter found by logistic regression applied on the test set
     """
     
-    plt.semilogx(lambdas, train_errors, color='b', marker='*', label="Train error")
-    plt.semilogx(lambdas, test_errors, color='r', marker='*', label="Test error")
     plt.semilogx(lambdas, accuracies, color='g', marker='*', label="Accuracies")
-    plt.xlabel("hyper-parameter")
-    plt.ylabel("RMSE")
+    plt.xlabel("lambda")
+    plt.ylabel("Accuracy")
     plt.title("Ridge Regression")
-    leg = plt.legend(loc=1, shadow=True)
+    leg = plt.legend(loc=8, shadow=True)
+    leg.draw_frame(False)
+    plt.semilogx(degrees, accuracies, color='m', marker='*', label="Accuracies")
+    plt.title("Ridge Regression")
+    plt.xlabel("degree")
+    plt.ylabel("Accuracy")
+    leg = plt.legend(loc=8, shadow=True)
     leg.draw_frame(False)
 
-def choose_lambda_logistic(y,tX, initial_w, maxiter, gamma):
-    """
-    Returns the optimal lambda obtained with cross-validation for logistic regression
-    """
-    seed = 1
-    k_fold = 4
-    lambdas = np.logspace(-6, 0, 20)
-
-    # splitting data in k fold
-    k_indices = build_k_indices(y, k_fold, seed)
-
-    rmse_tr = []
-    rmse_te = []
-    accuracies = []
-
-    for i in range(len(lambdas)):
-        lambda_ = lambdas[i]
-        tr_loss = 0
-        te_loss = 0
-        accuracy_i = 0
-        for k in range(k_fold):
-            loss_tr, loss_te, accuracy = cross_validation_logistic(y, tX, k_indices, k, lambda_, initial_w, maxiter, gamma)[1:]
-            tr_loss = tr_loss + loss_tr
-            te_loss = te_loss + loss_te
-            accuracy_i = accuracy_i + accuracy
-        rmse_tr.append(np.sqrt(2 * tr_loss/k_fold))
-        rmse_te.append(np.sqrt(2 * te_loss/k_fold))
-        accuracies.append(accuracy_i/k_fold)
-        print ("lambda = ", lambdas[i], ' - accuracy = ', accuracy_i/k_fold)
-    plot_train_test_logistic(rmse_tr, rmse_te, accuracies, lambdas)
-    return lambdas[np.argmin(rmse_te)]
-
-def choose_degree_logistic(y,tX, maxiter, gamma):
-    """
-    Returns the optimal degree obtained with cross-validation for logistic regression
-    """
-    seed = 1
-    k_fold = 4
-    degrees = [1,2,3,4,5,6,7]
-
-    # splitting data in k fold
-    k_indices = build_k_indices(y, k_fold, seed)
-
-    rmse_tr = []
-    rmse_te = []
-
-    for i in range(len(degrees)):
-        deg = degrees[i]
-        tr_loss = 0
-        te_loss = 0
-        for k in range(k_fold):
-            initial_w = np.zeros(tX.shape[1])
-            loss_tr, loss_te = cross_validation_logistic_degree(y, tX, k_indices, deg, k, maxiter, gamma)[1:]
-            tr_loss = tr_loss + loss_tr
-            te_loss = te_loss + loss_te
-        rmse_tr.append(np.sqrt(2 * tr_loss/k_fold))
-        rmse_te.append(np.sqrt(2 * te_loss/k_fold))
-    plot_train_test_logistic(rmse_tr, rmse_te, degrees)
-    return degrees[np.argmin(rmse_te)]
-
-def choose_lambda_ridge(y,tX, initial_w, maxiter, gamma):
-    """
-    Returns the optimal lambda obtained with cross-validation for ridge regression
-    """
-    seed = 1
-    k_fold = 4
-    lambdas = np.logspace(-6, 0, 20)
-
-    # splitting data in k fold
-    k_indices = build_k_indices(y, k_fold, seed)
-
-    rmse_tr = []
-    rmse_te = []
-
-    for i in range(len(lambdas)):
-        lambda_ = lambdas[i]
-        tr_loss = 0
-        te_loss = 0
-        for k in range(k_fold):
-            loss_tr, loss_te = cross_validation(y, tX, k_indices, k, lambda_)[1:]
-            tr_loss = tr_loss + loss_tr
-            te_loss = te_loss + loss_te
-        rmse_tr.append(np.sqrt(2 * tr_loss/k_fold))
-        rmse_te.append(np.sqrt(2 * te_loss/k_fold))
-    plot_train_test_ridge(rmse_tr, rmse_te, lambdas)
-    return lambdas[np.argmin(rmse_te)]
-
-def choose_degree_ridge(y,tX, maxiter, gamma):
-    """
-    Returns the optimal degree obtained with cross-validation for ridge regression
-    """
-    seed = 1
-    k_fold = 4
-    degrees = [1,2,3,4,5,6,7]
-    lambda_ = 1e-6 # which resulted optimum
-
-    # splitting data in k fold
-    k_indices = build_k_indices(y, k_fold, seed)
-
-    rmse_tr = []
-    rmse_te = []
-
-    for i in range(len(degrees)):
-        deg = degrees[i]
-        tr_loss = 0
-        te_loss = 0
-        for k in range(k_fold):
-            loss_tr, loss_te = cross_validation_degree(y, tX, k_indices, k, lambda_, deg)[1:]
-            tr_loss = tr_loss + loss_tr
-            te_loss = te_loss + loss_te
-        rmse_tr.append(np.sqrt(2 * tr_loss/k_fold))
-        rmse_te.append(np.sqrt(2 * te_loss/k_fold))
-    print(rmse_te)
-    print(rmse_tr)
-    plot_train_test_ridge(rmse_tr, rmse_te, degrees)
-    return degrees[np.argmin(rmse_te)]
