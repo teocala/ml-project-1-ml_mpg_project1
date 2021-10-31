@@ -15,7 +15,9 @@ They can be downloaded from in https://github.com/epfml/ML_course/tree/master/pr
 
 - `implementations.py` contains the implementation of 6 requested methods to train the model.
 - `run.py` generates the results using the selected model to predict test data.
-- `utilities.py` contains all the functions implemented for pre-processing and hyper-parameter choice.
+- `utilities.py` contains all the functions implemented for pre-processing.
+- `parameter_selection_utilities.py` contains the definitions of the functions used in `parameter_selection.py` for the hyper-parameters' choice.
+- `parameter_selection.py` generates the optimal hyper-parameters with cross-validation. 
 - `plots.py` generates the exploratory plots of the training features.
 - `proj1_helpers.py` contains useful functions for reading/writing on `.csv` files.
 
