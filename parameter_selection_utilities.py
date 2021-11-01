@@ -109,7 +109,7 @@ def choose_parameters_l1_regression(degrees, lambdas, k_fold, y, tx, seed):
 def cross_validation_l1(y, x, k_indices, k, degree, lambda_):
     """return the loss of lasso regression."""
     
-    gamma = 0.01
+    gamma = 0.0001
     max_iters = 500 
 
     # get k'th subgroup in test, others in train:

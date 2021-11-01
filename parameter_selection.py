@@ -36,11 +36,27 @@ J = len(jets)
 degrees_ridge = np.zeros(J)
 lambdas_ridge = np.zeros(J)
 accs_ridge = np.zeros(J)
+degrees_l1 = np.zeros(J)
+lambdas_l1 = np.zeros(J)
+accs_l1 = np.zeros(J)
 k_fold = 3
 
 
 # We will not need the 22-th feature in the dataset anymore
 tX_train = np.delete(tX_train, 22, axis = 1)
+
+# for i in range(J):
+#     j = jets[i]
+#     tX = tX_train[j]
+#     y = y_train[j]
+
+
+#     tX = preprocessing(tX)
+#     tX = eliminate_outliers(tX, alpha)
+
+#     degrees_ridge[i],lambdas_ridge[i],accs_ridge[i] = choose_parameters_ridge_regression(degrees, lambdas, k_fold, y, tX, seed)
+
+""" Optimal parameters for Lasso Regression """
 
 for i in range(J):
     j = jets[i]
@@ -51,10 +67,5 @@ for i in range(J):
     tX = preprocessing(tX)
     tX = eliminate_outliers(tX, alpha)
 
-    degrees_ridge[i],lambdas_ridge[i],accs_ridge[i] = choose_parameters_ridge_regression(degrees, lambdas, k_fold, y, tX, seed)
+    degrees_l1[i],lambdas_l1[i],accs_l1[i] = choose_parameters_l1_regression(degrees, lambdas, k_fold, y, tX, seed)
 
-""" Optimal parameters for Lasso Regression """
-
-
-
-""" Optimal parameters for Logistic Regression """
