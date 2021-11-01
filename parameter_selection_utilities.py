@@ -137,18 +137,3 @@ def cross_validation_l1(y, x, k_indices, k, degree, lambda_):
 
     return acc_train, acc_test
 
-
-
-def plot_accuracies_l1(accuracies, lambdas):
-    """
-    Plot of the test accuracy for each value of lambda
-    """
-    for i in range(accuracies.shape[1]):
-        i_plt = str(i+1)
-        plt.semilogx(lambdas, accuracies[:,i], marker='*', label="Accuracy - Jet N° " + i_plt)
-    plt.xlabel("lambda")
-    plt.ylabel("Accuracy")
-    plt.title("L1 - regularized logistic Regression")
-    leg = plt.legend(loc='best', shadow=True)
-    leg.draw_frame(False)
-    plt.savefig("accuracies_l1.png")
