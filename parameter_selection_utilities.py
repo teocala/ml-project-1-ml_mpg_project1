@@ -14,7 +14,7 @@ from proj1_helpers import *
 
 def build_k_indices(y, k_fold, seed):
     """
-    Build k indices for k-fold
+    Builds k indices for k-fold
     """
     num_row = y.shape[0]
     interval = int(num_row / k_fold)
@@ -53,7 +53,9 @@ def choose_parameters_ridge_regression(degrees, lambdas, k_fold, y, tx, seed):
     return best_deg, best_l, acc
 
 def cross_validation_ridge(y, x, k_indices, k, degree, lambda_):
-    """return the loss of ridge regression."""
+    """
+    Perfroms the k-th step of cross-validation for ridge regression
+    """
 
     # get k'th subgroup in test, others in train:
     ind = k_indices[k,:]
@@ -102,7 +104,9 @@ def choose_parameters_l1_regression(y, tx, degrees, lambdas, k_fold, seed):
     return comparison
 
 def cross_validation_l1(y, x, k_indices, k, degree, lambda_):
-    """return the loss of lasso regression."""
+    """
+    Perfroms the k-th step of cross-validation for regularized logistic regression
+    """
 
     gamma = 0.0001
     max_iters = 500
@@ -137,8 +141,7 @@ def cross_validation_l1(y, x, k_indices, k, degree, lambda_):
 
 def plot_accuracies_l1(accuracies, lambdas):
     """
-    train_errors, test_errors and lambdas should be list (of the same size) the respective train error and test error for a given lambda,
-    * lambda[0] = 1
+    Plot of the test accuracy for each value of lambda
     """
     for i in range(accuracies.shape[1]):
         i_plt = str(i+1)
@@ -149,26 +152,3 @@ def plot_accuracies_l1(accuracies, lambdas):
     leg = plt.legend(loc='best', shadow=True)
     leg.draw_frame(False)
     plt.savefig("accuracies_l1.png")
-
-
-
-def plot_train_test_ridge(accuracies, lambdas, degrees):
-    """
-    train_errors, test_errors and lambas should be list (of the same size) the respective train error and test error for a given lambda,
-    * lambda[0] = 1
-    * train_errors[0] = RMSE of a logistic regression on the train set
-    * test_errors[0] = RMSE of the parameter found by logistic regression applied on the test set
-    """
-
-    plt.semilogx(lambdas, accuracies, color='g', marker='*', label="Accuracies")
-    plt.xlabel("lambda")
-    plt.ylabel("Accuracy")
-    plt.title("Ridge Regression")
-    leg = plt.legend(loc=8, shadow=True)
-    leg.draw_frame(False)
-    plt.semilogx(degrees, accuracies, color='m', marker='*', label="Accuracies")
-    plt.title("Ridge Regression")
-    plt.xlabel("degree")
-    plt.ylabel("Accuracy")
-    leg = plt.legend(loc=8, shadow=True)
-    leg.draw_frame(False)
