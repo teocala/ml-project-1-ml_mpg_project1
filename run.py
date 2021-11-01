@@ -17,7 +17,7 @@ if __name__ == '__main__':
 
     # Data loading
 
-    # TODO: In the same directory of your repository folder, create a folder "data" where you place the data downloaded from
+    # TODO: In the same directory of your code, create a folder "data" where you place the data downloaded from
     #  1) https://github.com/epfml/ML_course/tree/master/projects/project1/data
     #  or
     #  2) https://www.aicrowd.com/challenges/epfl-machine-learning-higgs

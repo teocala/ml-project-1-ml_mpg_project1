@@ -255,7 +255,9 @@ proximal_operator_l1 = lambda x, lambda_, alpha: np.maximum(np.abs(x)-alpha*lamb
 
 
 def fista(y, tx, initial_w, max_iters, gamma, lambda_):
-
+    """
+    Implementation of a FISTA method to decrease computational time
+    """
     z = w = initial_w
     t = 1.0
 

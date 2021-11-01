@@ -11,7 +11,9 @@ from implementations import *
 from utilities import *
 
 def FeaturesPlot(y,tX,features):
-
+    """
+    Generates exploratory plots for features (one plot for each feature)
+    """
     for i in range(len(features)):
 
         y =  y[(tX[:,i] != - 999.0)]
@@ -41,7 +43,9 @@ def get_jet_masks(x):
     }
 
 def labels_in_training(y,tX):
-    
+    """
+    Generates a plot which shows how labels are distributed among different num_jet classes in the training dataset
+    """
     msk_jets_train = get_jet_masks(tX)
 
     ax = plt.subplot(111)
