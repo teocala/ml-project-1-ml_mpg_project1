@@ -97,7 +97,7 @@ def choose_parameters_l1_regression(y, tx, degrees, lambdas, k_fold, seed):
                 acc_test = cross_validation_l1(y, tx, k_indices, k, degree, lamb)[1]
                 accs_test.append(acc_test)
             comparison.append([degree,lamb,np.mean(accs_test)])
-    comparison = np.matrix(comparison)
+    comparison = np.array(comparison)
 
     return comparison
 

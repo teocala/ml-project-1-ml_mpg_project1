@@ -66,7 +66,7 @@ Two relevant examples of empirical distribution plots are shown in Figure \ref{f
 \end{itemize}
 
 \subsection{Polynomial Feature Expansion}
-This technique improves the representation power of linear models. For each feature, in addiction to its powers from 1 to M (whose choice is analyzed in the following paragraph), we add as further features its square, its square root and cubic root.
+This technique improves the representation power of linear models. For each feature, in addiction to its powers from 1 to M (whose choice is described later), we added as further features its square root and cubic root.
 Moreover, we included all the pairwise products.\\
 The polynomial degree is one of the hyper-parameters of our model; its optimal value M is found performing 3-fold cross-validation.
 
@@ -91,9 +91,9 @@ We implemented the regularized versions as well in order to reduce overfitting:
 \item \textbf{Regularized Logistic Regression with L2 norm}
 \end{itemize}
 
-The optimal hyper-parameter $\lambda$ has been chosen with a 3-fold cross-validation. In Figure ~\ref{reg_lambda}, we report the accuracy trends for training and test set, which lead to our choice of hyper-parameters.
+The optimal hyper-parameter $\lambda$ has been chosen with a 3-fold cross-validation. In Figure ~\ref{reg_lambda}, we report the accuracy trends, which lead to our choice of hyper-parameters.
+\vspace{-0.32cm}
 \begin{center}
-\vspace{-0.5cm}
 \begin{figure}[h] 
 		\includegraphics[width = 8cm]{../accuracies_l1.png} 
 	\caption{\emph{RMSE} errors and accuracies obtained through a cross-validation for different values of $\lambda$ ($L^1$ regularizer).}
@@ -107,9 +107,9 @@ It is noteworthy to notice that a \emph{FISTA} method has been implemented to re
 We also implemented the K-nearest classification algorithm, which provides an accuracy of $0.799$; nevertheless, this method is not recommended as the ones presented in Table~\ref{table1} because of the high-dimensionality of the problem ($=30$) and the high computational time. It is however true that, without an in-depth preprocessing, it turned out to be more accurate than the logistic regression methods. The reason lies in the fact that, when features are in different forms and are not adapted for a logistic model, a spacial method is more suitable because of its simplicity and its lack of any model assumptions.
 \section{Results}
 \label{results}
-We report the accuracy results obtained for each method, with the optimal choice of hyper-parameters: \\
+We report the accuracy results obtained for each method with the optimal choice of hyper-parameters: \\
 
-\textcolor{red}{INSERIRE I DATI GIUSTI}
+
 \begin{center}
 \label{table1}
 \begin{tabular}{|c c|} 
@@ -133,7 +133,7 @@ We report the accuracy results obtained for each method, with the optimal choice
 \end{tabular}
 \end{center}
 
-
+\vspace{3mm}
 
 \section{Conclusion}
 
