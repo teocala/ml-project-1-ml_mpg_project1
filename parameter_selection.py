@@ -55,6 +55,7 @@ tX_train = np.delete(tX_train, 22, axis = 1)
 #     degrees_ridge[i],lambdas_ridge[i],accs_ridge[i] = choose_parameters_ridge_regression(degrees, lambdas, k_fold, y, tX, seed)
 
 """ Optimal parameters for Lasso Regression """
+accuracies = np.zeros([len(lambdas),J])
 
 for i in range(J):
     j = jets[i]
@@ -66,4 +67,6 @@ for i in range(J):
     tX = preprocessing(tX)
     tX = eliminate_outliers(tX, alpha)
 
-    degrees_l1[i],lambdas_l1[i],accs_l1[i] = choose_parameters_l1_regression(y, tX, [deg], lambdas, k_fold = 3, seed = 1)
+    accuracies[i,:] = choose_parameters_l1_regression(y, tX, [deg], lambdas, k_fold = 3, seed = 1)[:,2]
+    
+plot_accuracies_l1(accuracies, lambdas)

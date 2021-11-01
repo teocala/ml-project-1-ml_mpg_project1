@@ -97,14 +97,9 @@ def choose_parameters_l1_regression(y, tx, degrees, lambdas, k_fold, seed):
                 acc_test = cross_validation_l1(y, tx, k_indices, k, degree, lamb)[1]
                 accs_test.append(acc_test)
             comparison.append([degree,lamb,np.mean(accs_test)])
+    comparison = np.matrix(comparison)
 
-    comparison = np.array(comparison)
-    ind_best =  np.argmax(comparison[:,2])
-    best_deg = comparison[ind_best,0]
-    best_l = comparison[ind_best,1]
-    acc = comparison[ind_best,2]
-
-    return best_deg, best_l, acc
+    return comparison
 
 def cross_validation_l1(y, x, k_indices, k, degree, lambda_):
     """return the loss of lasso regression."""
@@ -145,17 +140,13 @@ def plot_accuracies_l1(accuracies, lambdas):
     train_errors, test_errors and lambdas should be list (of the same size) the respective train error and test error for a given lambda,
     * lambda[0] = 1
     """
-    plt.semilogx(lambdas, accuracies, color='g', marker='*', label="Accuracies")
+    for i in range(accuracies.shape[1]):
+        i_plt = str(i+1)
+        plt.semilogx(lambdas, accuracies[:,i], marker='*', label="Accuracy - Jet N° " + i_plt)
     plt.xlabel("lambda")
     plt.ylabel("Accuracy")
     plt.title("L1 - regularized logistic Regression")
-    leg = plt.legend(loc=8, shadow=True)
-    leg.draw_frame(False)
-    plt.semilogx(degrees, accuracies, color='m', marker='*', label="Accuracies")
-    plt.title("L1 - regularized logistic Regression")
-    plt.xlabel("degree")
-    plt.ylabel("Accuracy")
-    leg = plt.legend(loc=8, shadow=True)
+    leg = plt.legend(loc='best', shadow=True)
     leg.draw_frame(False)
     plt.savefig("accuracies_l1.png")
 
