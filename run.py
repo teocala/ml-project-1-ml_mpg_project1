@@ -35,10 +35,7 @@ if __name__ == '__main__':
 
     """ Parameters assignment """
     alpha = 0.1
-    maxiter = 2000
-    gamma = 0.1
-    lambda_ = 0.01
-    #degree = 2
+    opt_degrees = [2,2,2,1]
 
 
     """ Splitting of training and test data according to the categorical feature PRI_jet_num """
@@ -62,9 +59,6 @@ if __name__ == '__main__':
     tX_train = np.delete(tX_train, 22, axis = 1)
     tX_test = np.delete(tX_test, 22, axis = 1)
 
-    #opt_degrees = np.zeros(4)
-    opt_degrees = [2,2,2,2]
-    #lambda_ = 1e-6
 
     for num_jet in range(4):
         j = jets[num_jet]
@@ -77,31 +71,31 @@ if __name__ == '__main__':
 
         """ Correction of the training data """
         y [y < 0] = 0
-        tX = preprocessing(tX)
-        tX = eliminate_outliers(tX, alpha)
-        #tX = build_poly(tX,deg)
-        tX = build_poly_with_roots(tX, deg)
+        tX = preprocessing(tX) # Preprocessing transformations described in the report (see utilities.py for details)
+        tX = eliminate_outliers(tX, alpha) # Elimination of (1-alpha) outliers
+        tX = build_poly_with_roots(tX, deg) # Polynomial augmentation: addition of polynomials until degree deg, square and cubic roots and pairwise products
 
 
         """ Choice of the logistic regression regularization parameter"""
+        # To be used for a cross-validation over lambda parameters (warning: it requires a long time)
         #initial_w = np.zeros(tX.shape[1])
         #lambda_ = choose_lambda_logistic(y, tX, initial_w, maxiter=100, gamma=0.1)
 
 
         """ Regularized logistic regression """
         initial_w = np.zeros(tX.shape[1])
-        loss, weights = l1_logistic_regression(y, tX, initial_w, lambda_=0.01, max_iters=2000, gamma=0.1)
-        #loss, weights = fista(y, tX, initial_w, maxiter, gamma, lambda_)
+        loss, weights = fista(y, tX, initial_w, max_iters = 500, gamma = 0.1, lambda_ = 0.001)
+        # Otherwise, l1_logistic_regression in implementations.py could be used for the L1/lasso regularization
+        # (i.e. the standard subgradient method) but this is slower.
 
 
         """ Correction of the test data """
         tX_jt = preprocessing(tX_jt)
-        #tX_jt = build_poly(tX_jt, deg)
         tX_jt = build_poly_with_roots(tX_jt, deg)
 
         """ Prection for the current jet_num """
         y_pred[j_test] = predict_labels(weights, tX_jt)
-        #y_pred[j_test] = k_nearest(tX, y, tX_jt, 9)
+        # Otherwise k_nearest in utilities.py could be used, warning: it requires a long time
 
 
 
