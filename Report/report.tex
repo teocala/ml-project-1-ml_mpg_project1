@@ -31,11 +31,11 @@ In section~\ref{preprocessing}, we present the analysis of the database and the 
 
 \subsection{First Analysis of the Dataset}
 \label{categorical}
-The dataset contains 250000 points for training and 568238 for testing with 30 features and their corresponding binary labels (``-1" for ``background" and ``1" for ``signal"), which clearly have to be predicted in the case of the test set. \\
-First of all, we noticed that one feature, \emph{PRI\_jet\_num}, is the only one to be categorical; it represents the number of jets (showers of hadrons originating from a quark and a gluon, clustered together after being produced in a particle collision) and it ranges from 0 to 3. Inspired by the challenge documentation, we noticed that some features are meaningless for some values of jets, therefore we have split the dataset into 4 subclasses, each one characterized by a different \emph{PRI\_jet\_num}.
+The dataset contains 250000 points for training and 568238 for testing with 30 features and their corresponding binary labels (``-1" for ``background" and ``1" for ``signal"), which clearly have to be predicted for the test set values. \\
+First of all, we notice that one feature, \emph{PRI\_jet\_num}, is the only one to be categorical; it represents the number of jets (showers of hadrons originating from a quark and a gluon, clustered together after being produced in a particle collision) and it ranges from 0 to 3. Inspired by the challenge documentation, we noticed that some features are meaningless for some values of jets, therefore we have split the dataset into 4 subclasses, each one characterized by a different \emph{PRI\_jet\_num}.
 
 \subsection{Management of Missing Values}
-From the documentation, we know that each ``-999" value present in the dataset represents a missing value; firstly, we decided not to consider features presenting more than 70 \% missing data. Then, the remaining missing values have been replaced by the median of the feature which is, according to theory, a robust estimator.
+From the documentation, we know that each ``-999" value in the dataset consists in a missing value; firstly, we decided not to consider features presenting more than 70 \% missing data. Then, the remaining missing values have been replaced by the median of the feature which is, according to theory, a robust estimator.
 
 \subsection{Standardization}
 In order to ensure a good functioning of the numeric optimization, it is a good practice to standardize the dataset: we subtracted from each feature its mean and divided by its standard deviation.
@@ -95,7 +95,7 @@ The optimal hyper-parameter $\lambda$ has been chosen with a 3-fold cross-valida
 \begin{center}
 \vspace{-0.5cm}
 \begin{figure}[h] 
-		\includegraphics[width = 8cm]{reg_logistic_regression.png} 
+		\includegraphics[width = 8cm]{../accuracies_l1.png} 
 	\caption{\emph{RMSE} errors and accuracies obtained through a cross-validation for different values of $\lambda$ ($L^1$ regularizer).}
 	\label{reg_lambda}
 \end{figure}
