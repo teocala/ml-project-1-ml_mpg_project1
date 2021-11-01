@@ -16,12 +16,11 @@ y_train, tX_train, ids = load_csv_data(DATA_TRAIN_PATH)
 
 N = len(y_train) # training set cardinality
 D = tX_train.shape[1] # number of parameters ("dimensionality")
-    
-degrees = [1,2,3,4,5,6,7]
-lambdas = np.logspace(-5,0,10)
+
+degrees = [2,2,2,1]
+lambdas = np.logspace(-4,-1,10)
 alpha = 0.1
 
-seed = 1
 
 """ Optimal parameters for Ridge Regression """
 
@@ -39,7 +38,6 @@ accs_ridge = np.zeros(J)
 degrees_l1 = np.zeros(J)
 lambdas_l1 = np.zeros(J)
 accs_l1 = np.zeros(J)
-k_fold = 3
 
 
 # We will not need the 22-th feature in the dataset anymore
@@ -62,10 +60,10 @@ for i in range(J):
     j = jets[i]
     tX = tX_train[j]
     y = y_train[j]
+    deg = degrees[i]
 
 
     tX = preprocessing(tX)
     tX = eliminate_outliers(tX, alpha)
 
-    degrees_l1[i],lambdas_l1[i],accs_l1[i] = choose_parameters_l1_regression(degrees, lambdas, k_fold, y, tX, seed)
-
+    degrees_l1[i],lambdas_l1[i],accs_l1[i] = choose_parameters_l1_regression(y, tX, [deg], lambdas, k_fold = 3, seed = 1)

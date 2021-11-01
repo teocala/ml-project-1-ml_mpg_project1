@@ -26,7 +26,7 @@ def build_k_indices(y, k_fold, seed):
 
 def choose_parameters_ridge_regression(degrees, lambdas, k_fold, y, tx, seed):
     """
-    Returns the hyper-parameters among the ones passed as input which maximize the accuracy predicted with cross validation 
+    Returns the hyper-parameters among the ones passed as input which maximize the accuracy predicted with cross validation
     """
     # split data in k fold
     k_indices = build_k_indices(y, k_fold, seed)
@@ -41,15 +41,15 @@ def choose_parameters_ridge_regression(degrees, lambdas, k_fold, y, tx, seed):
                 acc_test = cross_validation_ridge(y, tx, k_indices, k, degree, lamb)[1]
                 accs_test.append(acc_test)
             comparison.append([degree,lamb,np.mean(accs_test)])
-    
+
     comparison = np.array(comparison)
-    ind_best =  np.argmax(comparison[:,2])      
+    ind_best =  np.argmax(comparison[:,2])
     best_deg = comparison[ind_best,0]
     best_l = comparison[ind_best,1]
     acc = comparison[ind_best,2]
-    
+
     #plot_train_test_ridge(comparison[:,2], lambdas, degrees)
-   
+
     return best_deg, best_l, acc
 
 def cross_validation_ridge(y, x, k_indices, k, degree, lambda_):
@@ -73,16 +73,16 @@ def cross_validation_ridge(y, x, k_indices, k, degree, lambda_):
     # calculate the accuracy for train and test data:
     y_tr_pred = predict_labels(w, basis_tr)
     y_te_pred = predict_labels(w, basis_te)
-        
+
     acc_train = compute_accuracy(y_tr_pred, y_tr)
     acc_test = compute_accuracy(y_te_pred, y_te)
 
     return acc_train, acc_test
 
 
-def choose_parameters_l1_regression(degrees, lambdas, k_fold, y, tx, seed):
+def choose_parameters_l1_regression(y, tx, degrees, lambdas, k_fold, seed):
     """
-    Returns the hyper-parameters among the ones passed as input which maximize the accuracy predicted with cross validation 
+    Returns the hyper-parameters among the ones passed as input which maximize the accuracy predicted with cross validation
     """
     # split data in k fold
     k_indices = build_k_indices(y, k_fold, seed)
@@ -97,20 +97,20 @@ def choose_parameters_l1_regression(degrees, lambdas, k_fold, y, tx, seed):
                 acc_test = cross_validation_l1(y, tx, k_indices, k, degree, lamb)[1]
                 accs_test.append(acc_test)
             comparison.append([degree,lamb,np.mean(accs_test)])
-    
+
     comparison = np.array(comparison)
-    ind_best =  np.argmax(comparison[:,2])      
+    ind_best =  np.argmax(comparison[:,2])
     best_deg = comparison[ind_best,0]
     best_l = comparison[ind_best,1]
     acc = comparison[ind_best,2]
-   
+
     return best_deg, best_l, acc
 
 def cross_validation_l1(y, x, k_indices, k, degree, lambda_):
     """return the loss of lasso regression."""
-    
+
     gamma = 0.0001
-    max_iters = 500 
+    max_iters = 500
 
     # get k'th subgroup in test, others in train:
     ind = k_indices[k,:]
@@ -131,21 +131,19 @@ def cross_validation_l1(y, x, k_indices, k, degree, lambda_):
     # calculate the accuracy for train and test data:
     y_tr_pred = predict_labels(w, basis_tr)
     y_te_pred = predict_labels(w, basis_te)
-        
+
     acc_train = compute_accuracy(y_tr_pred, y_tr)
     acc_test = compute_accuracy(y_te_pred, y_te)
-    
+
 
     return acc_train, acc_test
 
 
 
-def plot_train_test_l1(train_errors, test_errors, accuracies, lambdas):
+def plot_accuracies_l1(accuracies, lambdas):
     """
-    train_errors, test_errors and lambas should be list (of the same size) the respective train error and test error for a given lambda,
+    train_errors, test_errors and lambdas should be list (of the same size) the respective train error and test error for a given lambda,
     * lambda[0] = 1
-    * train_errors[0] = RMSE of a logistic regression on the train set
-    * test_errors[0] = RMSE of the parameter found by logistic regression applied on the test set
     """
     plt.semilogx(lambdas, accuracies, color='g', marker='*', label="Accuracies")
     plt.xlabel("lambda")
@@ -159,7 +157,10 @@ def plot_train_test_l1(train_errors, test_errors, accuracies, lambdas):
     plt.ylabel("Accuracy")
     leg = plt.legend(loc=8, shadow=True)
     leg.draw_frame(False)
-    
+    plt.savefig("accuracies_l1.png")
+
+
+
 def plot_train_test_ridge(accuracies, lambdas, degrees):
     """
     train_errors, test_errors and lambas should be list (of the same size) the respective train error and test error for a given lambda,
@@ -167,7 +168,7 @@ def plot_train_test_ridge(accuracies, lambdas, degrees):
     * train_errors[0] = RMSE of a logistic regression on the train set
     * test_errors[0] = RMSE of the parameter found by logistic regression applied on the test set
     """
-    
+
     plt.semilogx(lambdas, accuracies, color='g', marker='*', label="Accuracies")
     plt.xlabel("lambda")
     plt.ylabel("Accuracy")
@@ -180,4 +181,3 @@ def plot_train_test_ridge(accuracies, lambdas, degrees):
     plt.ylabel("Accuracy")
     leg = plt.legend(loc=8, shadow=True)
     leg.draw_frame(False)
-
