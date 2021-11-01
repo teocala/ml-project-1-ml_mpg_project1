@@ -78,7 +78,7 @@ if __name__ == '__main__':
 
         """ Choice of the logistic regression regularization parameter"""
         # To be used for a cross-validation over lambda parameters (warning: it requires a long time)
-        #degree,lambda,accuracy = choose_parameters_l1_regression(y, tX, deg, lambdas, k_fold = 4, seed = 1)
+        #degree,lambda,accuracy = choose_parameters_l1_regression(y, tX, deg, lambdas, k_fold = 3, seed = 1)
 
 
         """ Regularized logistic regression """
