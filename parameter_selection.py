@@ -40,6 +40,7 @@ lambdas_l1 = np.zeros(J)
 accs_l1 = np.zeros(J)
 
 
+
 # We will not need the 22-th feature in the dataset anymore
 tX_train = np.delete(tX_train, 22, axis = 1)
 
@@ -66,7 +67,6 @@ for i in range(J):
 
     tX = preprocessing(tX)
     tX = eliminate_outliers(tX, alpha)
-
-    accuracies[i,:] = choose_parameters_l1_regression(y, tX, [deg], lambdas, k_fold = 3, seed = 1)[:,2]
+    accuracies[:,i] = choose_parameters_l1_regression(y, tX, [deg], lambdas, k_fold = 3, seed = 1)[:,2]
     
 plot_accuracies_l1(accuracies, lambdas)
