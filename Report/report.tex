@@ -24,34 +24,28 @@
 \section{Introduction}
 
 The goal of the challenge is to estimate the likelihood that a given event's signature is the result of a Higgs boson or of some other process/particle. This is because, rather than observing the boson directly, scientists measure the products that result from its decay process which may be similar to other particles' ones. \\
-In section~\ref{preprocessing}, we present the analysis of the database and the meticulous preprocessing; afterwards, in section~\ref{models}, we present the models built with the 6 requested algorithms and the selection of the best hyper-parameters; afterwards, in section~\ref{results}, we illustrate their performance.
+In section~\ref{preprocessing}, we present the analysis of the database and the meticulous preprocessing; afterwards, in section~\ref{models}, we present the models built with the 6 requested algorithms and the selection of the best hyper-parameters; finally, in section~\ref{results}, we illustrate their performance.
 
 \section{Preprocessing}
 \label{preprocessing}
 
 \subsection{First Analysis of the Dataset}
 \label{categorical}
-The dataset contains 250000 points for training and 568238 for testing with 30 features and their corresponding binary labels ("-1" for "background" and "1" for "signal"), which clearly have to be predicted in the case of the test set. \\
+The dataset contains 250000 points for training and 568238 for testing with 30 features and their corresponding binary labels (``-1" for ``background" and ``1" for ``signal"), which clearly have to be predicted in the case of the test set. \\
 First of all, we noticed that one feature, \emph{PRI\_jet\_num}, is the only one to be categorical; it represents the number of jets (showers of hadrons originating from a quark and a gluon, clustered together after being produced in a particle collision) and it ranges from 0 to 3. Inspired by the challenge documentation, we noticed that some features are meaningless for some values of jets, therefore we have split the dataset into 4 subclasses, each one characterized by a different \emph{PRI\_jet\_num}.
 
 \subsection{Management of Missing Values}
-From the documentation, we know that each "-999" value present in the dataset represents a missing value; firstly, we decided not to consider features presenting more than 70 \% missing data. Then, the remaining missing values have been replaced by the median of the feature which is, according to theory, a robust estimator.
+From the documentation, we know that each ``-999" value present in the dataset represents a missing value; firstly, we decided not to consider features presenting more than 70 \% missing data. Then, the remaining missing values have been replaced by the median of the feature which is, according to theory, a robust estimator.
 
 \subsection{Standardization}
-In order to ensure a good functioning of the numeric optimization, it is a good practice to standardize the dataset: we subtract from each feature its mean and divide by its standard deviation.
+In order to ensure a good functioning of the numeric optimization, it is a good practice to standardize the dataset: we subtracted from each feature its mean and divided by its standard deviation.
 This helps the feature matrix in having a better condition number. Moreover, this is a good practice to balance the weights of all the features for certain operations such as the computation of the distance in the \emph{K-nearest-neighbors method}.
 
 \subsection{Feature Engineering}
-We plot the features and ideate strategies to deal with their peculiarities.
+We plotted the features and ideated strategies to deal with their peculiarities.
 Two relevant examples of empirical distribution plots are shown in Figure \ref{fig:empdistr}.
 
-\begin{itemize}
-    \item \textbf{Logaritmic transform:} for positive features, we compute a transformation into $\log(1+x)$, which helps in reducing or removing the skewness of our original data. Since the distribution of some of our continuous features is non-normal, we apply this strategy to make the data as ``normal" as possible. 
-    \item \textbf{Useless features:} from the observation of the plots (e.g. Figure \ref{fig1}), we noticed that the empirical distribution of some features does not change with the label, therefore we simplify our model by not considering them.
-    \item \textbf{Angles:} the features in columns 15,18,20,24,27\footnote{Note that the columns after the 22th have their ID decreased by one, since the \emph{PRI\_jet\_num} column has been deleted} represented measures of angles. The applied strategy to adapt the periodicity in a regression study was to replace this column with the $\cos(x)$ and $\sin(x)$ transformations. However, since the sine feature turned out to be ineffective, it has been discarded to avoid overfitting and only the cosene transformation has been kept.
-\end{itemize}
-
-\begin{figure}[h]
+\begin{figure}
     \centering
      \subfloat[Labels by \emph{PRI\_jet\_num} \label{fig1}]{
         \includegraphics[scale=0.27]{labels_training.png}
@@ -64,13 +58,20 @@ Two relevant examples of empirical distribution plots are shown in Figure \ref{f
     \label{fig:empdistr}
 \end{figure}
 
+\begin{itemize}
+    \item \textbf{Logaritmic transform:} for positive features, we computed a transformation into $\log(1+x)$, which helps in reducing or removing the skewness of our original data. Since the distribution of some of our continuous features is non-normal, we applied this strategy to make the data as ``normal" as possible. 
+    \item \textbf{Useless features:} from the observation of the plots (e.g. Figure \ref{fig1}), we noticed that the empirical distribution of some features does not change with the label, therefore we simplified our model by not considering them.
+    \item \textbf{Symmetrical features:} we computed the absolute value of features in columns 14,17,23,26\footnote{\label{note1}Note that the columns after the 22th have their ID decreased by one, since the \emph{PRI\_jet\_num} column has been deleted}, which have a symmetric distribution with respect to 0.
+    \item \textbf{Angles:} the features in columns 15,18,20,24,27$^{\hyperref[note1]{1}}$ represent measures of angles. The applied strategy to adapt the periodicity in a regression study was to replace this column with the $\cos(x)$ and $\sin(x)$ transformations. However, since the sine feature turns out to be ineffective, it has been discarded to avoid overfitting and only the cosine transformation has been kept.
+\end{itemize}
+
 \subsection{Polynomial Feature Expansion}
-This technique improves the representation power of linear models. For each feature, we added as further features its square, its square root and cubic root.
+This technique improves the representation power of linear models. For each feature, in addiction to its powers from 1 to M (whose choice is analyzed in the following paragraph), we add as further features its square, its square root and cubic root.
 Moreover, we included all the pairwise products.\\
-\textcolor{red}{SCRIVERE SE LO RISOLVIAMO:} The optimal degree 2 of the polynomial expansion is found performing 4-fold cross-validation.
+The polynomial degree is one of the hyper-parameters of our model; its optimal value M is found performing 3-fold cross-validation.
 
 \subsection{Management of Outliers}
-To deal with the presence of outliers, we fix $\alpha = 0.1$ and decide to cap the extreme values of each feature to the $\alpha$-quantile (for the lower tail) and to the $(1-\alpha)$-quantile (for the upper tail).
+To deal with the presence of outliers, we fixed $\alpha = 0.1$ and decided to cap the extreme values of each feature to the $\alpha$-quantile (for the lower tail) and to the $(1-\alpha)$-quantile (for the upper tail).
 
 \section{Models and Methods}
 \label{models}
@@ -85,24 +86,25 @@ The methods considered are:
     \end{itemize}
 We implemented the regularized versions as well in order to reduce overfitting:
 \begin{itemize}
-\item \textbf{Lasso Regression}
 \item \textbf{Ridge Regression}
-\item \textbf{Regularized Logistic Regression}
+\item \textbf{Lasso Logistic Regression} (Logistic with L1-regularization)
+\item \textbf{Regularized Logistic Regression with L2 norm}
 \end{itemize}
 
-The optimal hyper-parameter $\lambda$ is chosen with a 4-fold cross-validation. In Figure ~\ref{reg_lambda}, we report the accuracy trends for training and test set, which lead to our choice of hyper-parameters. \textcolor{red}{SCRIVERE MEGLIO QUANDO LO AVREMO}.
-\\
+The optimal hyper-parameter $\lambda$ has been chosen with a 3-fold cross-validation. In Figure ~\ref{reg_lambda}, we report the accuracy trends for training and test set, which lead to our choice of hyper-parameters.
+\begin{center}
+\vspace{-0.5cm}
 \begin{figure}[h] 
-	\centering
-		\includegraphics[scale=0.27]{../reg_logistic_regression.png} 
+		\includegraphics[width = 8cm]{reg_logistic_regression.png} 
 	\caption{\emph{RMSE} errors and accuracies obtained through a cross-validation for different values of $\lambda$ ($L^1$ regularizer).}
 	\label{reg_lambda}
 \end{figure}
-\\
-It is noteworthy to notice that a \emph{FISTA} method has been implemented to replace and improve in time the standard \emph{Gradient Descent} when the reduction of the computational cost was essential, for instance in the previous cross-validation study. 
-\\
+\vspace{-0.5cm}
+\end{center}
+It is noteworthy to notice that a \emph{FISTA} method has been implemented to replace and improve in terms of computational time the standard \emph{Gradient Descent} when the reduction of the computational cost is essential, for instance in the previous cross-validation study.
 \newline
-We also implemented the K-nearest classification algorithm, which provides an accuracy of \textcolor{red}{INSERIRE}; nevertheless, this method is not recommended as the ones presented in Table~\ref{table1} because of the high-dimensionality of the problem ($=30$) and the high computational time. It is however true that, without an in-depth preprocessing, it turns out to be more accurate than the logistic regression methods. The reason lies in the fact that, when features are in different forms and are not adapted for a logistic model, a spacial method is more suitable because of its simplicity and its lack of any model assumptions.
+\newline
+We also implemented the K-nearest classification algorithm, which provides an accuracy of $0.799$; nevertheless, this method is not recommended as the ones presented in Table~\ref{table1} because of the high-dimensionality of the problem ($=30$) and the high computational time. It is however true that, without an in-depth preprocessing, it turned out to be more accurate than the logistic regression methods. The reason lies in the fact that, when features are in different forms and are not adapted for a logistic model, a spacial method is more suitable because of its simplicity and its lack of any model assumptions.
 \section{Results}
 \label{results}
 We report the accuracy results obtained for each method, with the optimal choice of hyper-parameters: \\
@@ -110,23 +112,23 @@ We report the accuracy results obtained for each method, with the optimal choice
 \textcolor{red}{INSERIRE I DATI GIUSTI}
 \begin{center}
 \label{table1}
-\begin{tabular}{|c c c|} 
+\begin{tabular}{|c c|} 
  \hline
- Method & Train Accuracy & Test Accuracy  \\ [0.5ex] 
+ Method & Test Accuracy  \\ [0.5ex] 
  \hline\hline
- Least Squares GD & 6 & 87837  \\ 
+ Least Squares GD & 6   \\ 
  \hline
- Least Squares SGD & 7 & 78 \\
+ Least Squares SGD & 7  \\
  \hline
- Least Squares Normal Eqs. & 545 & 778  \\
+ Least Squares Normal Eqs. & 545   \\
  \hline
- Lasso Regression & 545 & 18744  \\
+ Ridge Regression & 88   \\ 
  \hline
- Ridge Regression & 88 & 788  \\ 
+ Logistic Regression & 0.797   \\
  \hline
- Logistic Regression & 545 & 18744  \\
+ Reg. Logistic Regression (L2) & 0.832   \\
  \hline
- Reg. Logistic Regression & 545 & 18744  \\
+ Lasso Logistic Regression & 0.829   \\
  \hline
 \end{tabular}
 \end{center}
@@ -135,9 +137,8 @@ We report the accuracy results obtained for each method, with the optimal choice
 
 \section{Conclusion}
 
-The best performance, with an accuracy on the test set of \textcolor{red}{INSERIRE NUMERO E POSIZIONE IN CLASSIFICA SE ALTA}, is obtained with the Lasso Regression; this highlights how even standard models can be powerful in solving complex classification tasks, and how regularization can help to reduce overfitting.
+The best performance, with an accuracy on the test set of \textcolor{red}{0.836}, was obtained with the Lasso Regression; this highlights how even standard models can be powerful in solving complex classification tasks, and how regularization can help to reduce overfitting.
 In addiction, we want to remark that a relevant part of the success of the task is up to the data preprocessing and interpretation.
 
 
 \end{document}
-
